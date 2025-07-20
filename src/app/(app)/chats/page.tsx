@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { SendHorizontal, Phone, Bot, Video, Mic, Paperclip } from "lucide-react";
+import { SendHorizontal, Phone, Bot, Video, Mic, Paperclip, Trash, Copy, CheckSquare } from "lucide-react";
 import Image from "next/image";
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useRef, ChangeEvent } from "react";
@@ -68,6 +68,14 @@ function ChatContent() {
     fileInputRef.current?.click();
   }
 
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+  };
+
+  const handleDelete = (id: string) => {
+    setMessages(messages.filter(msg => msg.id !== id));
+  }
+
   return (
     <div className="h-[calc(100vh-8rem)] flex flex-col p-2 md:p-4 animate-fade-in-up">
       <div className="flex-1 bg-muted/50 rounded-3xl shadow-inner overflow-hidden">
@@ -97,24 +105,44 @@ function ChatContent() {
                     <div className="flex items-baseline gap-2" dir={message.sender === 'user' ? 'rtl' : 'ltr'}>
                       <p className="text-sm font-semibold">{message.name}</p>
                     </div>
-                    <div
-                      className={cn(
-                        "rounded-xl px-4 py-2.5 bg-card shadow-sm",
-                        { 'p-2': message.image && !message.text }
-                      )}
-                    >
-                      {message.text}
-                      {message.image && (
-                        <Image
-                          src={message.image}
-                          alt="User uploaded image"
-                          data-ai-hint="man portrait"
-                          width={200}
-                          height={266}
-                          className="rounded-lg mt-2"
-                        />
-                      )}
-                    </div>
+                     <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                         <div
+                          className={cn(
+                            "rounded-xl px-4 py-2.5 bg-card shadow-sm cursor-pointer",
+                            { 'p-2': message.image && !message.text }
+                          )}
+                        >
+                          {message.text}
+                          {message.image && (
+                            <Image
+                              src={message.image}
+                              alt="User uploaded image"
+                              data-ai-hint="man portrait"
+                              width={200}
+                              height={266}
+                              className="rounded-lg mt-2"
+                            />
+                          )}
+                        </div>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        {message.text && (
+                          <DropdownMenuItem onClick={() => handleCopy(message.text)}>
+                            <Copy className="mr-2 h-4 w-4" />
+                            <span>Copy</span>
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem>
+                           <CheckSquare className="mr-2 h-4 w-4" />
+                           <span>Select</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDelete(message.id)} className="text-destructive">
+                          <Trash className="mr-2 h-4 w-4" />
+                          <span>Delete</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                     <p className="text-xs text-muted-foreground px-1">{message.time}</p>
                   </div>
                 </div>
