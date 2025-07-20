@@ -1,13 +1,16 @@
+
 "use client"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { Gift, Send, Phone, Bot } from "lucide-react";
+import { Gift, Send, Phone, Bot, Video, Mic } from "lucide-react";
 import Image from "next/image";
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from "react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+
 
 type Message = {
   id: string;
@@ -92,10 +95,24 @@ function ChatContent() {
             <Send className="h-5 w-5" />
           </Button>
           <div className="w-px h-6 bg-border mx-1"></div>
-          <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6"><path d="M15.63 15.63a1 1 0 1 0-1.26-1.26l-3.37 3.37-3.37-3.37a1 1 0 1 0-1.26 1.26l3.37 3.37-3.37 3.37a1 1 0 1 0 1.26 1.26l3.37-3.37 3.37 3.37a1 1 0 0 0 1.26-1.26l-3.37-3.37 3.37-3.37zM10.5 2.5a1 1 0 0 0-2 0v1a1 1 0 0 0 2 0v-1zm-4.13.13a1 1 0 0 0-1.26 1.26l.24.24a1 1 0 0 0 1.26-1.26l-.24-.24zm8.26 0a1 1 0 0 0-.24 1.5l.24.24a1 1 0 0 0 1.26-1.26l-.24-.24a1 1 0 0 0-1.02-.24zM4.5 10.5a1 1 0 0 0 0-2h-1a1 1 0 0 0 0 2h1zm13 0a1 1 0 0 0 0-2h-1a1 1 0 0 0 0 2h1z" /></svg>
-            <span className="sr-only">Call</span>
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0">
+                    <Phone className="h-5 w-5" />
+                    <span className="sr-only">Call</span>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuItem>
+                    <Video className="mr-2 h-4 w-4" />
+                    <span>Video Call</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                    <Mic className="mr-2 h-4 w-4" />
+                    <span>Voice Call</span>
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </div>
