@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { Gift, Send, Phone, Bot, Video, Mic } from "lucide-react";
+import { SendHorizontal, Phone, Bot, Video, Mic, Paperclip } from "lucide-react";
 import Image from "next/image";
 import { useSearchParams } from 'next/navigation';
-import { Suspense } from "react";
+import { Suspense, useState, useRef, ChangeEvent } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 
@@ -22,11 +22,51 @@ type Message = {
   image?: string;
 };
 
-const messages: Message[] = [];
-
 function ChatContent() {
   const searchParams = useSearchParams();
   const agentName = searchParams.get('agent') || 'AI Companion';
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputValue, setInputValue] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleSendMessage = () => {
+    if (inputValue.trim() === '') return;
+
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      sender: 'user',
+      text: inputValue,
+      avatar: 'https://placehold.co/100x100.png',
+      name: 'You',
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+    setMessages([...messages, newMessage]);
+    setInputValue('');
+  };
+
+  const handleImageSelect = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const newMessage: Message = {
+          id: Date.now().toString(),
+          sender: 'user',
+          text: '',
+          image: e.target?.result as string,
+          avatar: 'https://placehold.co/100x100.png',
+          name: 'You',
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
+        setMessages(prevMessages => [...prevMessages, newMessage]);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const triggerFileSelect = () => {
+    fileInputRef.current?.click();
+  }
 
   return (
     <div className="h-[calc(100vh-8rem)] flex flex-col p-2 md:p-4 animate-fade-in-up">
@@ -60,6 +100,7 @@ function ChatContent() {
                     <div
                       className={cn(
                         "rounded-xl px-4 py-2.5 bg-card shadow-sm",
+                        { 'p-2': message.image && !message.text }
                       )}
                     >
                       {message.text}
@@ -85,14 +126,27 @@ function ChatContent() {
       <div className="mt-auto bg-card rounded-2xl shadow-lg p-3 mx-auto w-full max-w-2xl mt-3">
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 flex-grow bg-background rounded-xl p-2">
-            <Gift className="h-5 w-5 text-muted-foreground" />
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleImageSelect}
+              className="hidden" 
+              accept="image/*"
+            />
+            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={triggerFileSelect}>
+                <Paperclip className="h-5 w-5 text-muted-foreground" />
+                <span className="sr-only">Attach file</span>
+            </Button>
             <Input
               placeholder={`Message ${agentName}`}
               className="bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base flex-grow h-auto p-0"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
             />
           </div>
-          <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0">
-            <Send className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0" onClick={handleSendMessage}>
+            <SendHorizontal className="h-5 w-5" />
           </Button>
           <div className="w-px h-6 bg-border mx-1"></div>
           <DropdownMenu>
