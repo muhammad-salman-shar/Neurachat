@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { BellRing, Snooze, Trash2 } from "lucide-react";
+import { BellOff, Trash2 } from "lucide-react";
 
 const notifications = [
     { agent: "Teacher Agent", message: "Reminder: Quiz in 15 minutes!", avatar: "https://placehold.co/40x40.png", type: "reminder" },
@@ -39,7 +39,7 @@ export default function NotificationsPage() {
                             </div>
                             <div className="flex gap-1">
                                <Button variant="ghost" size="icon" className="h-8 w-8">
-                                    <Snooze className="h-4 w-4" />
+                                    <BellOff className="h-4 w-4" />
                                     <span className="sr-only">Snooze</span>
                                 </Button>
                                 <Button variant="ghost" size="icon" className="h-8 w-8">

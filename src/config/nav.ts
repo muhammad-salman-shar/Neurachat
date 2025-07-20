@@ -1,4 +1,4 @@
-import { MessageSquare, Users, Library, History, type LucideIcon } from "lucide-react";
+import { MessageSquare, Cpu, Library, History, type LucideIcon } from "lucide-react";
 
 type NavItem = {
   href: string;
@@ -17,7 +17,7 @@ export const NAV_ITEMS: NavItem[] = [
   {
     href: "/agents",
     label: "Agents",
-    icon: Users,
+    icon: Cpu,
     tooltip: "Manage AI agents",
   },
   {
