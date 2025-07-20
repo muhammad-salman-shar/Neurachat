@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { SendHorizontal, Phone, Bot, Video, Mic, Paperclip, Trash, Copy, CheckSquare } from "lucide-react";
+import { SendHorizontal, Phone, Bot, Video, Mic, Paperclip, Trash, Copy, CheckSquare, X } from "lucide-react";
 import Image from "next/image";
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useRef, ChangeEvent } from "react";
@@ -27,6 +27,7 @@ function ChatContent() {
   const agentName = searchParams.get('agent') || 'AI Companion';
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
+  const [selectedMessages, setSelectedMessages] = useState<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSendMessage = () => {
@@ -76,8 +77,38 @@ function ChatContent() {
     setMessages(messages.filter(msg => msg.id !== id));
   }
 
+  const handleSelect = (id: string) => {
+    setSelectedMessages(prev => {
+      const newSelected = new Set(prev);
+      if (newSelected.has(id)) {
+        newSelected.delete(id);
+      } else {
+        newSelected.add(id);
+      }
+      return newSelected;
+    });
+  };
+
+  const handleDeleteSelected = () => {
+    setMessages(messages.filter(msg => !selectedMessages.has(msg.id)));
+    setSelectedMessages(new Set());
+  }
+
+  const inSelectionMode = selectedMessages.size > 0;
+
   return (
     <div className="h-[calc(100vh-8rem)] flex flex-col p-2 md:p-4 animate-fade-in-up">
+       {inSelectionMode && (
+        <div className="flex items-center justify-between p-2 bg-card mb-2 rounded-xl">
+          <Button variant="ghost" size="icon" onClick={() => setSelectedMessages(new Set())}>
+            <X className="h-5 w-5" />
+          </Button>
+          <span className="font-semibold">{selectedMessages.size} selected</span>
+          <Button variant="ghost" size="icon" onClick={handleDeleteSelected}>
+            <Trash className="h-5 w-5 text-destructive" />
+          </Button>
+        </div>
+      )}
       <div className="flex-1 bg-muted/50 rounded-3xl shadow-inner overflow-hidden">
         <ScrollArea className="h-full p-4">
           {messages.length === 0 ? (
@@ -89,64 +120,72 @@ function ChatContent() {
             </div>
           ) : (
             <div className="space-y-6">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={cn(
-                    "flex items-end gap-3",
-                    message.sender === "user" && "flex-row-reverse"
-                  )}
-                >
-                  <Avatar className={cn("h-10 w-10", message.sender === 'ai' ? 'border-2 border-blue-500' : 'bg-black')}>
-                    <AvatarImage src={message.avatar} alt={message.name} data-ai-hint="person face" />
-                    <AvatarFallback className={message.sender === 'user' ? 'bg-black text-white' : ''}>{message.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div className={cn("max-w-xs md:max-w-md lg:max-w-lg space-y-1", message.sender === 'user' && 'items-end flex flex-col')}>
-                    <div className="flex items-baseline gap-2" dir={message.sender === 'user' ? 'rtl' : 'ltr'}>
-                      <p className="text-sm font-semibold">{message.name}</p>
-                    </div>
-                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                         <div
-                          className={cn(
-                            "rounded-xl px-4 py-2.5 bg-card shadow-sm cursor-pointer",
-                            { 'p-2': message.image && !message.text }
+              {messages.map((message) => {
+                 const isSelected = selectedMessages.has(message.id);
+                 return (
+                  <div
+                    key={message.id}
+                    className={cn(
+                      "flex items-end gap-3",
+                      message.sender === "user" && "flex-row-reverse"
+                    )}
+                  >
+                    <Avatar className={cn("h-10 w-10", message.sender === 'ai' ? 'border-2 border-blue-500' : 'bg-black')}>
+                      <AvatarImage src={message.avatar} alt={message.name} data-ai-hint="person face" />
+                      <AvatarFallback className={message.sender === 'user' ? 'bg-black text-white' : ''}>{message.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className={cn("max-w-xs md:max-w-md lg:max-w-lg space-y-1", message.sender === 'user' && 'items-end flex flex-col')}>
+                      <div className="flex items-baseline gap-2" dir={message.sender === 'user' ? 'rtl' : 'ltr'}>
+                        <p className="text-sm font-semibold">{message.name}</p>
+                      </div>
+                       <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                           <div
+                            className={cn(
+                              "rounded-xl px-4 py-2.5 bg-card shadow-sm cursor-pointer relative",
+                              { 'p-2': message.image && !message.text },
+                              isSelected && "ring-2 ring-primary"
+                            )}
+                          >
+                            {isSelected && (
+                              <div className="absolute -top-2 -left-2 bg-primary rounded-full p-0.5">
+                                <CheckSquare className="h-4 w-4 text-primary-foreground" />
+                              </div>
+                            )}
+                            {message.text}
+                            {message.image && (
+                              <Image
+                                src={message.image}
+                                alt="User uploaded image"
+                                data-ai-hint="man portrait"
+                                width={200}
+                                height={266}
+                                className="rounded-lg mt-2"
+                              />
+                            )}
+                          </div>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          {message.text && (
+                            <DropdownMenuItem onClick={() => handleCopy(message.text)}>
+                              <Copy className="mr-2 h-4 w-4" />
+                              <span>Copy</span>
+                            </DropdownMenuItem>
                           )}
-                        >
-                          {message.text}
-                          {message.image && (
-                            <Image
-                              src={message.image}
-                              alt="User uploaded image"
-                              data-ai-hint="man portrait"
-                              width={200}
-                              height={266}
-                              className="rounded-lg mt-2"
-                            />
-                          )}
-                        </div>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        {message.text && (
-                          <DropdownMenuItem onClick={() => handleCopy(message.text)}>
-                            <Copy className="mr-2 h-4 w-4" />
-                            <span>Copy</span>
+                          <DropdownMenuItem onClick={() => handleSelect(message.id)}>
+                             <CheckSquare className="mr-2 h-4 w-4" />
+                             <span>{isSelected ? "Deselect" : "Select"}</span>
                           </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem>
-                           <CheckSquare className="mr-2 h-4 w-4" />
-                           <span>Select</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDelete(message.id)} className="text-destructive">
-                          <Trash className="mr-2 h-4 w-4" />
-                          <span>Delete</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    <p className="text-xs text-muted-foreground px-1">{message.time}</p>
+                          <DropdownMenuItem onClick={() => handleDelete(message.id)} className="text-destructive">
+                            <Trash className="mr-2 h-4 w-4" />
+                            <span>Delete</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      <p className="text-xs text-muted-foreground px-1">{message.time}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+              )})}
             </div>
           )}
         </ScrollArea>
