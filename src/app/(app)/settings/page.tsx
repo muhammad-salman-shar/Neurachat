@@ -2,13 +2,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { User, Cpu, DatabaseZap, ShieldCheck, Wand, Info } from "lucide-react";
+import { User, Cpu, DatabaseZap, ShieldCheck, Wand, Info, BellRing } from "lucide-react";
 
 const settingsOptions = [
     { icon: User, title: "Account", description: "Profile pic, name, status", action: "button", actionText: "Edit Profile" },
     { icon: Cpu, title: "Agents", description: "Add new agents, personality settings", action: "button", actionText: "Manage Agents" },
     { icon: DatabaseZap, title: "Memory & Cloud", description: "Storage use, clean/delete option", action: "switch", id: "cloud-sync" },
     { icon: ShieldCheck, title: "Privacy", description: "Data encryption, manual delete", action: "button", actionText: "View Options" },
+    { icon: BellRing, title: "Smart Notifications", description: "Enable or disable smart notifications", action: "switch", id: "smart-notifications" },
     { icon: Wand, title: "Theme", description: "Light/Dark mode, color customizations", action: "switch", id: "dark-mode" },
     { icon: Info, title: "About", description: "Version 1.0.0, check for updates", action: "none" },
 ];
@@ -33,7 +34,7 @@ export default function SettingsPage() {
                             </div>
                             <div>
                                 {option.action === 'button' && <Button variant="outline">{option.actionText}</Button>}
-                                {option.action === 'switch' && <Switch id={option.id} />}
+                                {option.action === 'switch' && <Switch id={option.id} defaultChecked={option.id === 'smart-notifications'} />}
                             </div>
                         </div>
                     ))}
