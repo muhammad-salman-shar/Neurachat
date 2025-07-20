@@ -26,7 +26,7 @@ const messages: Message[] = [
 
 export default function ChatsPage() {
   return (
-    <div className="h-[calc(100vh-8rem)] flex flex-col p-2 md:p-4">
+    <div className="h-[calc(100vh-8rem)] flex flex-col p-2 md:p-4 animate-fade-in-up">
       <div className="flex-1 bg-muted/50 rounded-3xl shadow-inner overflow-hidden">
       <ScrollArea className="h-full p-4">
         <div className="space-y-6">

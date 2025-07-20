@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Heart, BrainCircuit, Briefcase, Handshake, ShieldCheck, Dumbbell, Zap, TrendingUp } from "lucide-react";
+import Link from "next/link";
 
 const agents = [
     { name: "Friend Agent", mood: "Chill", icon: <Handshake />, avatar: "https://placehold.co/100x100.png", hint: "friendly person", status: "Online - 'Bhai bored lag raha?'", active: true },
@@ -19,27 +20,29 @@ export default function AgentsPage() {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {agents.map((agent) => (
-                <Card key={agent.name} className="flex flex-col border-border/60 hover:border-primary/80 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10">
-                    <CardHeader className="flex flex-row items-center gap-4">
-                        <Avatar className="h-16 w-16 text-4xl text-primary">
-                            <AvatarImage src={agent.avatar} data-ai-hint={agent.hint} />
-                            <AvatarFallback className="bg-primary/10">{agent.icon}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                            <CardTitle>{agent.name}</CardTitle>
-                            <CardDescription>
-                                <Badge variant="outline">{agent.mood}</Badge>
-                            </CardDescription>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="flex-grow">
-                        <p className="text-sm text-muted-foreground">{agent.status}</p>
-                    </CardContent>
-                    <CardFooter className="flex justify-between items-center">
-                        <span className="text-sm font-medium">Status</span>
-                        <Switch defaultChecked={agent.active} aria-label={`Activate ${agent.name}`} />
-                    </CardFooter>
-                </Card>
+                <Link href="/chats" key={agent.name} className="block hover:no-underline">
+                    <Card className="flex flex-col border-border/60 hover:border-primary/80 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 h-full">
+                        <CardHeader className="flex flex-row items-center gap-4">
+                            <Avatar className="h-16 w-16 text-4xl text-primary">
+                                <AvatarImage src={agent.avatar} data-ai-hint={agent.hint} />
+                                <AvatarFallback className="bg-primary/10">{agent.icon}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <CardTitle>{agent.name}</CardTitle>
+                                <CardDescription>
+                                    <Badge variant="outline">{agent.mood}</Badge>
+                                </CardDescription>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="flex-grow">
+                            <p className="text-sm text-muted-foreground">{agent.status}</p>
+                        </CardContent>
+                        <CardFooter className="flex justify-between items-center">
+                            <span className="text-sm font-medium">Status</span>
+                            <Switch defaultChecked={agent.active} aria-label={`Activate ${agent.name}`} />
+                        </CardFooter>
+                    </Card>
+                </Link>
             ))}
         </div>
     );
