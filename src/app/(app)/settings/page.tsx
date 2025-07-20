@@ -15,7 +15,6 @@ import { useToast } from "@/hooks/use-toast"
 
 const settingsOptions = [
     { id: "account", icon: User, title: "Account", description: "Profile pic, name, status", action: "button", actionText: "Edit Profile" },
-    { id: "agents", icon: Cpu, title: "Agents", description: "Add new agents, personality settings", action: "button", actionText: "Manage Agents" },
     { id: "cloud-sync", icon: DatabaseZap, title: "Memory & Cloud", description: "Storage use, clean/delete option", action: "switch" },
     { id: "privacy", icon: ShieldCheck, title: "Privacy", description: "Data encryption, manual delete", action: "button", actionText: "View Options" },
     { id: "smart-notifications", icon: BellRing, title: "Smart Notifications", description: "Enable or disable smart notifications", action: "switch" },
