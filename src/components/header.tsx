@@ -1,62 +1,27 @@
 import Link from "next/link";
-import { Bell } from "lucide-react";
-
+import { Settings, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export default function Header() {
   return (
-    <header className="flex h-16 items-center gap-4 border-b bg-card px-4 md:px-6 sticky top-0 z-30">
-        <div className="flex-none md:hidden">
-            <SidebarTrigger />
-        </div>
-        <div className="w-full flex-1">
-            <h1 className="text-lg font-semibold md:text-2xl">
-                Tera Asli Dost
+    <header className="flex h-16 items-center justify-between gap-4 bg-background px-4 md:px-6 sticky top-0 z-30">
+        <Link href="/agents" className="flex items-center gap-2">
+            <div className="h-9 w-9 rounded-full bg-black flex items-center justify-center">
+                 <Bot className="h-6 w-6 text-white" />
+            </div>
+            <span className="font-semibold text-primary">More Agents</span>
+        </Link>
+        <div className="w-full flex-1 text-center">
+            <h1 className="text-2xl font-bold text-primary" style={{ textShadow: '0 0 5px hsl(var(--primary) / 0.5)' }}>
+                NeuraSaMu
             </h1>
         </div>
-        <div className="flex items-center gap-4">
-            <Link href="/notifications" className="relative">
-                <Button variant="outline" size="icon" className="h-9 w-9">
-                    <Bell className="h-4 w-4" />
-                    <span className="sr-only">Toggle notifications</span>
-                </Button>
-                <span className="absolute top-0 right-0 -mt-1 -mr-1 flex h-3 w-3">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
-                </span>
-            </Link>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="secondary" size="icon" className="rounded-full">
-                        <Avatar>
-                            <AvatarImage src="https://placehold.co/40x40.png" alt="User Avatar" data-ai-hint="man portrait"/>
-                            <AvatarFallback>U</AvatarFallback>
-                        </Avatar>
-                        <span className="sr-only">Toggle user menu</span>
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                        <Link href="/settings">Settings</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>Support</DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>Logout</DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
-        </div>
+        <Link href="/settings">
+            <Button variant="ghost" size="icon">
+                <Settings className="h-6 w-6" />
+                <span className="sr-only">Settings</span>
+            </Button>
+        </Link>
     </header>
   );
 }
