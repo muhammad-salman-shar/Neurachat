@@ -113,7 +113,7 @@ function ChatContent() {
         <ScrollArea className="h-full p-4">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
-              <Bot className="h-20 w-20 mb-4" />
+              <span className="text-6xl mb-4">🤖</span>
               <h2 className="text-2xl font-bold text-foreground">Welcome!</h2>
               <p className="text-lg">I am your {agentName}.</p>
               <p>Send a message to start our conversation.</p>
