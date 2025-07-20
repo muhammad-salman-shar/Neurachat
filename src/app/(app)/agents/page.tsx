@@ -20,7 +20,7 @@ export default function AgentsPage() {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {agents.map((agent) => (
-                <Link href="/chats" key={agent.name} className="block hover:no-underline">
+                <Link href={`/chats?agent=${encodeURIComponent(agent.name)}`} key={agent.name} className="block hover:no-underline">
                     <Card className="flex flex-col border-border/60 hover:border-primary/80 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 h-full">
                         <CardHeader className="flex flex-row items-center gap-4">
                             <Avatar className="h-16 w-16 text-4xl text-primary">
