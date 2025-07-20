@@ -25,6 +25,7 @@ type Message = {
 function ChatContent() {
   const searchParams = useSearchParams();
   const agentName = searchParams.get('agent') || 'AI Companion';
+  const agentEmoji = searchParams.get('emoji') || '🤖';
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [selectedMessages, setSelectedMessages] = useState<Set<string>>(new Set());
@@ -113,7 +114,7 @@ function ChatContent() {
         <ScrollArea className="h-full p-4">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
-              <span className="text-6xl mb-4">🤖</span>
+              <span className="text-6xl mb-4">{agentEmoji}</span>
               <h2 className="text-2xl font-bold text-foreground">Welcome!</h2>
               <p className="text-lg">I am your {agentName}.</p>
               <p>Send a message to start our conversation.</p>

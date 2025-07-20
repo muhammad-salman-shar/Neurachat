@@ -6,21 +6,21 @@ import { Heart, BrainCircuit, Briefcase, Handshake, ShieldCheck, Dumbbell, Zap, 
 import Link from "next/link";
 
 const agents = [
-    { name: "Friend Agent", mood: "Chill", icon: <Handshake />, avatar: "https://placehold.co/100x100.png", hint: "friendly person", status: "Online - 'Bhai bored lag raha?'", active: true },
-    { name: "Teacher Agent", mood: "Strict", icon: <BrainCircuit />, avatar: "https://placehold.co/100x100.png", hint: "teacher woman", status: "Next Quiz - 'Kal revise kiya?'", active: true },
-    { name: "Boss Agent", mood: "Professional", icon: <Briefcase />, avatar: "https://placehold.co/100x100.png", hint: "business man", status: "Focus on your goals!", active: false },
-    { name: "Girlfriend Agent", mood: "Caring", icon: <Heart />, avatar: "https://placehold.co/100x100.png", hint: "happy woman", status: "How was your day?", active: true },
-    { name: "Religious Guide", mood: "Wise", icon: <ShieldCheck />, avatar: "https://placehold.co/100x100.png", hint: "wise person", status: "Peace be upon you.", active: false },
-    { name: "Gym Coach", mood: "Energetic", icon: <Dumbbell />, avatar: "https://placehold.co/100x100.png", hint: "fit person", status: "Let's get pumping!", active: true },
-    { name: "Comedian Agent", mood: "Sarcastic", icon: <Zap />, avatar: "https://placehold.co/100x100.png", hint: "laughing person", status: "Ready for a joke?", active: true },
-    { name: "Business Mentor", mood: "Serious", icon: <TrendingUp />, avatar: "https://placehold.co/100x100.png", hint: "mentor professional", status: "Let's talk strategy.", active: false },
+    { name: "Friend Agent", mood: "Chill", icon: <Handshake />, avatar: "https://placehold.co/100x100.png", hint: "friendly person", status: "Online - 'Bhai bored lag raha?'", active: true, emoji: "😁" },
+    { name: "Teacher Agent", mood: "Strict", icon: <BrainCircuit />, avatar: "https://placehold.co/100x100.png", hint: "teacher woman", status: "Next Quiz - 'Kal revise kiya?'", active: true, emoji: "📝" },
+    { name: "Boss Agent", mood: "Professional", icon: <Briefcase />, avatar: "https://placehold.co/100x100.png", hint: "business man", status: "Focus on your goals!", active: false, emoji: "💼" },
+    { name: "Girlfriend Agent", mood: "Caring", icon: <Heart />, avatar: "https://placehold.co/100x100.png", hint: "happy woman", status: "How was your day?", active: true, emoji: "🥰" },
+    { name: "Religious Guide", mood: "Wise", icon: <ShieldCheck />, avatar: "https://placehold.co/100x100.png", hint: "wise person", status: "Peace be upon you.", active: false, emoji: "🙏" },
+    { name: "Gym Coach", mood: "Energetic", icon: <Dumbbell />, avatar: "https://placehold.co/100x100.png", hint: "fit person", status: "Let's get pumping!", active: true, emoji: "💪" },
+    { name: "Comedian Agent", mood: "Sarcastic", icon: <Zap />, avatar: "https://placehold.co/100x100.png", hint: "laughing person", status: "Ready for a joke?", active: true, emoji: "😂" },
+    { name: "Business Mentor", mood: "Serious", icon: <TrendingUp />, avatar: "https://placehold.co/100x100.png", hint: "mentor professional", status: "Let's talk strategy.", active: false, emoji: "📈" },
 ];
 
 export default function AgentsPage() {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {agents.map((agent) => (
-                <Link href={`/chats?agent=${encodeURIComponent(agent.name)}`} key={agent.name} className="block hover:no-underline">
+                <Link href={`/chats?agent=${encodeURIComponent(agent.name)}&emoji=${encodeURIComponent(agent.emoji)}`} key={agent.name} className="block hover:no-underline">
                     <Card className="flex flex-col border-border/60 hover:border-primary/80 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 h-full">
                         <CardHeader className="flex flex-row items-center gap-4">
                             <Avatar className="h-16 w-16 text-4xl text-primary">
