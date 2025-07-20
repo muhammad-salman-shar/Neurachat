@@ -10,10 +10,7 @@ import { User, Cpu, DatabaseZap, ShieldCheck, Wand, Info, BellRing, CalendarIcon
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { format } from "date-fns"
-import { cn } from "@/lib/utils"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 
 const settingsOptions = [
@@ -28,7 +25,7 @@ const settingsOptions = [
 
 function EditProfileDialog() {
     const [name, setName] = useState("Sam");
-    const [dob, setDob] = useState<Date | undefined>(new Date("1998-05-15"));
+    const [year, setYear] = useState<string>("1998");
     const { toast } = useToast();
 
     const handleSave = () => {
@@ -37,6 +34,9 @@ function EditProfileDialog() {
             description: "Your new details have been saved.",
         });
     };
+
+    const currentYear = new Date().getFullYear();
+    const years = Array.from({ length: currentYear - 1920 + 1 }, (_, i) => currentYear - i);
 
     return (
         <DialogContent className="sm:max-w-[425px]">
@@ -55,31 +55,20 @@ function EditProfileDialog() {
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="dob" className="text-right">
-                        Date of birth
+                        Birth Year
                     </Label>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button
-                                id="dob"
-                                variant={"outline"}
-                                className={cn(
-                                    "w-[280px] justify-start text-left font-normal",
-                                    !dob && "text-muted-foreground"
-                                )}
-                            >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {dob ? format(dob, "PPP") : <span>Pick a date</span>}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                            <Calendar
-                                mode="single"
-                                selected={dob}
-                                onSelect={setDob}
-                                initialFocus
-                            />
-                        </PopoverContent>
-                    </Popover>
+                    <Select onValueChange={setYear} defaultValue={year}>
+                        <SelectTrigger className="col-span-3">
+                            <SelectValue placeholder="Select a year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {years.map((y) => (
+                                <SelectItem key={y} value={y.toString()}>
+                                    {y}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
             <DialogFooter>
