@@ -37,6 +37,8 @@
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 222 47% 18%;
     --sidebar-ring: 262.1 83.3% 57.8%;
+    --header-green: 142 76% 36%;
+    --header-green-foreground: 0 0% 98%;
   }
 
   .dark {
@@ -73,6 +75,8 @@
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 222 47% 18%;
     --sidebar-ring: 263.4 95.2% 58.4%;
+    --header-green: 142 76% 36%;
+    --header-green-foreground: 0 0% 98%;
   }
 }
  
