@@ -1,11 +1,15 @@
+
+"use client";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { UserPlus, Users, Search } from "lucide-react";
+import { UserPlus, Users, Search, Contact } from "lucide-react";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 const agents = [
     { name: "Friend Agent", avatar: "https://placehold.co/100x100.png", hint: "friendly person", emoji: "😁" },
@@ -18,13 +22,37 @@ const agents = [
     { name: "Business Mentor", avatar: "https://placehold.co/100x100.png", hint: "mentor professional", emoji: "📈" },
 ];
 
-const contacts = [
-    { name: "Alice", avatar: "https://placehold.co/100x100.png", hint: "woman smiling" },
-    { name: "Bob", avatar: "https://placehold.co/100x100.png", hint: "man glasses" },
-    { name: "Charlie", avatar: "https://placehold.co/100x100.png", hint: "person happy" },
-]
+type Contact = {
+    name?: string[];
+    icon?: string[];
+};
 
 export default function NewChatPage() {
+    const [phoneContacts, setPhoneContacts] = useState<Contact[]>([]);
+    const [isContactsApiSupported, setIsContactsApiSupported] = useState(false);
+
+    useEffect(() => {
+        if ('contacts' in navigator && 'select' in (navigator as any).contacts) {
+            setIsContactsApiSupported(true);
+        }
+    }, []);
+
+    const handleGetContacts = async () => {
+        if (!isContactsApiSupported) {
+            alert("Your browser doesn't support the Contact Picker API.");
+            return;
+        }
+
+        try {
+            const contacts = await (navigator as any).contacts.select(['name', 'icon'], { multiple: true });
+            if (contacts.length > 0) {
+                setPhoneContacts(contacts);
+            }
+        } catch (error) {
+            console.error("Error picking contacts:", error);
+        }
+    };
+
     return (
         <div className="h-[calc(100vh-10rem)] flex flex-col">
             <div className="relative mb-4">
@@ -69,17 +97,33 @@ export default function NewChatPage() {
 
                 <Separator className="my-4" />
 
-                <h2 className="text-lg font-semibold mb-2 px-2">Phone Contacts</h2>
+                <div className="flex justify-between items-center mb-2 px-2">
+                    <h2 className="text-lg font-semibold">Phone Contacts</h2>
+                    {isContactsApiSupported && (
+                        <Button onClick={handleGetContacts} variant="outline" size="sm">
+                            <Contact className="mr-2 h-4 w-4" />
+                            Sync Contacts
+                        </Button>
+                    )}
+                </div>
                 <div className="space-y-1">
-                    {contacts.map((contact) => (
-                       <div key={contact.name} className="flex items-center gap-4 p-3 rounded-2xl hover:bg-card transition-colors cursor-pointer">
-                            <Avatar className="h-12 w-12">
-                                <AvatarImage src={contact.avatar} data-ai-hint={contact.hint} />
-                                <AvatarFallback>{contact.name.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            <p className="font-bold text-lg text-foreground">{contact.name}</p>
-                        </div>
-                    ))}
+                    {phoneContacts.length > 0 ? (
+                        phoneContacts.map((contact, index) => (
+                           <div key={index} className="flex items-center gap-4 p-3 rounded-2xl hover:bg-card transition-colors cursor-pointer">
+                                <Avatar className="h-12 w-12">
+                                    {contact.icon && contact.icon.length > 0 ? (
+                                        <AvatarImage src={contact.icon[0]} data-ai-hint="person face" />
+                                    ) : (
+                                       <AvatarImage src="https://placehold.co/100x100.png" data-ai-hint="person placeholder" />
+                                    )}
+                                    <AvatarFallback>{contact.name ? contact.name[0].charAt(0) : '?'}</AvatarFallback>
+                                </Avatar>
+                                <p className="font-bold text-lg text-foreground">{contact.name ? contact.name[0] : "No Name"}</p>
+                            </div>
+                        ))
+                    ) : (
+                       <p className="text-sm text-muted-foreground px-4 py-2">Click "Sync Contacts" to select and display contacts from your phone.</p>
+                    )}
                 </div>
             </ScrollArea>
         </div>
