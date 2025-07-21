@@ -45,9 +45,9 @@ export default function ChatsPage() {
                      <Link href={`/chat-detail?agent=${encodeURIComponent(chat.name)}&emoji=${encodeURIComponent(chat.emoji)}`} key={`${chat.name}-${index}`} className="block hover:no-underline">
                         <div className="flex items-center gap-4 p-3 rounded-2xl hover:bg-card transition-colors cursor-pointer">
                             <div className="relative">
-                                <Avatar className="h-14 w-14">
+                                <Avatar className="h-14 w-14 text-2xl">
                                     <AvatarImage src={chat.avatar} data-ai-hint={chat.hint} />
-                                    <AvatarFallback>{chat.name.charAt(0)}</AvatarFallback>
+                                    <AvatarFallback>{chat.emoji}</AvatarFallback>
                                 </Avatar>
                                 {chat.unread && <span className="absolute bottom-0 right-0 block h-3.5 w-3.5 rounded-full bg-green-500 border-2 border-background"></span>}
                             </div>
