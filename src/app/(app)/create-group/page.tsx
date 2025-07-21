@@ -109,7 +109,7 @@ export default function CreateGroupPage() {
             name: groupName,
             avatar: groupImage || "https://placehold.co/100x100.png",
             hint: "group icon",
-            message: `${[...selectedAgents, ...selectedContacts].slice(0, 2).join(', ')} and others`,
+            message: `Welcome to ${groupName}`,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             isGroup: true,
             emoji: "👥",
