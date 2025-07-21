@@ -2,17 +2,31 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Settings, ChevronLeft, Bot } from "lucide-react";
+import { Settings, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [animate, setAnimate] = useState(false);
 
   const isSettingsPage = pathname === "/settings";
   const isChatDetailPage = pathname === "/chat-detail";
+  const isChatsPage = pathname === "/chats";
+
+  useEffect(() => {
+    if (isChatsPage) {
+      const animationShown = sessionStorage.getItem('neuraSaMuAnimationShown');
+      if (!animationShown) {
+        setAnimate(true);
+        sessionStorage.setItem('neuraSaMuAnimationShown', 'true');
+      }
+    }
+  }, [isChatsPage]);
+
 
   const agentName = searchParams.get('agent');
 
@@ -26,11 +40,14 @@ export default function Header() {
       );
     }
     
+    if (isChatsPage) {
+      return <h1 className={cn("text-2xl font-bold text-primary", animate && 'animate-fade-in-long')}>{ "NeuraSaMu" }</h1>;
+    }
+
     let pageTitle = "NeuraSaMu";
-    if (pathname === '/chats') pageTitle = "Chats";
     if (pathname === '/agents') pageTitle = "Agents";
     if (pathname === '/library') pageTitle = "Library";
-    if (pathname === '/history') pageTitle = "History";
+    if (pathname === '/archive') pageTitle = "Archive";
     if (pathname === '/settings') pageTitle = "Settings";
     
     return <h1 className={cn("text-2xl font-bold", isChatDetailPage ? 'text-header-green-foreground' : 'text-foreground')} style={{ textShadow: isChatDetailPage ? '0 0 5px hsl(var(--primary) / 0.5)' : 'none' }}>{pageTitle}</h1>;

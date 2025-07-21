@@ -1,32 +1,33 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Info } from "lucide-react";
 
-const history = {
+const archive = {
     "Today": [
-        { name: "Friend Agent", message: "Not much, bro! Just chillin'...", avatar: "https://placehold.co/40x40.png" },
-        { name: "Teacher Agent", message: "Remember to review chapter 5...", avatar: "https://placehold.co/40x40.png" },
+        { name: "Friend Agent", message: "Deleted chat snippet...", avatar: "https://placehold.co/40x40.png" },
+        { name: "Teacher Agent", message: "Deleted an image.", avatar: "https://placehold.co/40x40.png" },
     ],
     "Yesterday": [
-        { name: "Boss Agent", message: "Deadline is EOD tomorrow.", avatar: "https://placehold.co/40x40.png" },
-        { name: "Gym Coach", message: "You missed your workout!", avatar: "https://placehold.co/40x40.png" },
+        { name: "Boss Agent", message: "Deleted chat snippet...", avatar: "https://placehold.co/40x40.png" },
     ],
-    "June 15, 2024": [
-        { name: "Comedian Agent", message: "Why don't scientists trust atoms?...", avatar: "https://placehold.co/40x40.png" },
-    ]
 }
 
-export default function HistoryPage() {
+export default function ArchivePage() {
     return (
         <div className="space-y-6">
             <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input placeholder="Search by keyword or agent..." className="pl-10" />
+                <Input placeholder="Search archive..." className="pl-10" />
+            </div>
+
+            <div className="flex items-center gap-2 rounded-lg bg-muted p-3 text-sm text-muted-foreground">
+                <Info className="h-5 w-5" />
+                <p>Archived items are automatically deleted after 24 hours.</p>
             </div>
 
             <Accordion type="single" collapsible defaultValue="Today" className="w-full">
-                {Object.entries(history).map(([date, chats]) => (
+                {Object.entries(archive).map(([date, chats]) => (
                      <AccordionItem value={date} key={date}>
                         <AccordionTrigger className="text-lg font-semibold">{date}</AccordionTrigger>
                         <AccordionContent>

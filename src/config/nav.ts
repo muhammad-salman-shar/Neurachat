@@ -1,4 +1,4 @@
-import { MessageSquare, Cpu, Library, History, type LucideIcon } from "lucide-react";
+import { MessageSquare, Cpu, Library, Archive, type LucideIcon } from "lucide-react";
 
 type NavItem = {
   href: string;
@@ -27,9 +27,9 @@ export const NAV_ITEMS: NavItem[] = [
     tooltip: "Your saved media",
   },
   {
-    href: "/history",
-    label: "History",
-    icon: History,
-    tooltip: "Conversation history",
+    href: "/archive",
+    label: "Archive",
+    icon: Archive,
+    tooltip: "Archived items",
   },
 ];
