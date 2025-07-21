@@ -45,15 +45,15 @@ export default function Header() {
     }
 
     let pageTitle = "NeuraSaMu";
-    if (pathname === '/agents') pageTitle = "Agents";
     if (pathname === '/library') pageTitle = "Library";
     if (pathname === '/archive') pageTitle = "Archive";
     if (pathname === '/settings') pageTitle = "Settings";
+    if (pathname === '/new-chat') pageTitle = "New Chat";
     
     return <h1 className={cn("text-2xl font-bold", isChatDetailPage ? 'text-header-green-foreground' : 'text-foreground')} style={{ textShadow: isChatDetailPage ? '0 0 5px hsl(var(--primary) / 0.5)' : 'none' }}>{pageTitle}</h1>;
   };
 
-  const showBackButton = isSettingsPage || isChatDetailPage;
+  const showBackButton = isSettingsPage || isChatDetailPage || pathname === '/new-chat';
 
   return (
     <header className={cn("flex h-16 items-center justify-between gap-4 px-4 md:px-6 sticky top-0 z-30", isChatDetailPage ? "bg-header-green text-header-green-foreground" : "bg-card text-card-foreground border-b")}>
