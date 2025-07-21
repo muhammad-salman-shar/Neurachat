@@ -30,16 +30,20 @@ type Contact = {
 export default function NewChatPage() {
     const [phoneContacts, setPhoneContacts] = useState<Contact[]>([]);
     const [isContactsApiSupported, setIsContactsApiSupported] = useState(false);
+    const [isRunningInIframe, setIsRunningInIframe] = useState(false);
 
     useEffect(() => {
+        const inIframe = window.self !== window.top;
+        setIsRunningInIframe(inIframe);
+
         if ('contacts' in navigator && 'select' in (navigator as any).contacts) {
             setIsContactsApiSupported(true);
         }
     }, []);
 
     const handleGetContacts = async () => {
-        if (!isContactsApiSupported) {
-            alert("Your browser doesn't support the Contact Picker API.");
+        if (!isContactsApiSupported || isRunningInIframe) {
+            alert("Contact syncing is not available in this environment.");
             return;
         }
 
@@ -52,6 +56,8 @@ export default function NewChatPage() {
             console.error("Error picking contacts:", error);
         }
     };
+
+    const isSyncDisabled = !isContactsApiSupported || isRunningInIframe;
 
     return (
         <div className="h-[calc(100vh-10rem)] flex flex-col">
@@ -99,12 +105,10 @@ export default function NewChatPage() {
 
                 <div className="flex justify-between items-center mb-2 px-2">
                     <h2 className="text-lg font-semibold">Phone Contacts</h2>
-                    {isContactsApiSupported && (
-                        <Button onClick={handleGetContacts} variant="outline" size="sm">
-                            <Contact className="mr-2 h-4 w-4" />
-                            Sync Contacts
-                        </Button>
-                    )}
+                    <Button onClick={handleGetContacts} variant="outline" size="sm" disabled={isSyncDisabled}>
+                        <Contact className="mr-2 h-4 w-4" />
+                        Sync Contacts
+                    </Button>
                 </div>
                 <div className="space-y-1">
                     {phoneContacts.length > 0 ? (
@@ -122,7 +126,11 @@ export default function NewChatPage() {
                             </div>
                         ))
                     ) : (
-                       <p className="text-sm text-muted-foreground px-4 py-2">Click "Sync Contacts" to select and display contacts from your phone.</p>
+                       <p className="text-sm text-muted-foreground px-4 py-2">
+                         {isSyncDisabled
+                           ? "Contact syncing is unavailable in this preview environment."
+                           : 'Click "Sync Contacts" to select and display contacts from your phone.'}
+                       </p>
                     )}
                 </div>
             </ScrollArea>
