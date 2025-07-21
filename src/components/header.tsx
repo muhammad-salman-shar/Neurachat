@@ -3,10 +3,11 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Settings, ChevronLeft } from "lucide-react";
+import { Settings, ChevronLeft, Bot, Palette, Trash2, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export default function Header() {
   const pathname = usePathname();
@@ -57,6 +58,46 @@ export default function Header() {
 
   const showBackButton = isSettingsPage || isChatDetailPage || pathname === '/new-chat' || pathname === '/create-group';
 
+  const AgentSettingsMenu = () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className={cn(isChatDetailPage && 'hover:bg-black/10')}>
+          <Settings className="h-6 w-6" />
+          <span className="sr-only">Agent Settings</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Agent Settings</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <Bot className="mr-2 h-4 w-4" />
+          <span>Agent Mode</span>
+        </DropdownMenuItem>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <Palette className="mr-2 h-4 w-4" />
+            <span>Theme Color</span>
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            <DropdownMenuItem>Red</DropdownMenuItem>
+            <DropdownMenuItem>Green</DropdownMenuItem>
+            <DropdownMenuItem>Neon</DropdownMenuItem>
+            <DropdownMenuItem>Blue</DropdownMenuItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <Trash2 className="mr-2 h-4 w-4" />
+          <span>Clear Chat</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem className="text-destructive">
+          <ShieldAlert className="mr-2 h-4 w-4" />
+          <span>Report Agent</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
   return (
     <header className={cn("flex h-16 items-center justify-between gap-4 px-4 md:px-6 sticky top-0 z-30", isChatDetailPage ? "bg-header-green text-header-green-foreground" : "bg-card text-card-foreground border-b")}>
       <div className="flex items-center gap-2 w-1/4">
@@ -77,9 +118,11 @@ export default function Header() {
       <div className="flex items-center justify-end w-1/4">
         {isSettingsPage ? (
           <div className="w-9 h-9" /> // Placeholder to keep title centered
+        ) : isChatDetailPage ? (
+           <AgentSettingsMenu />
         ) : (
           <Link href="/settings">
-            <Button variant="ghost" size="icon" className={cn(isChatDetailPage && 'hover:bg-black/10')}>
+            <Button variant="ghost" size="icon">
               <Settings className="h-6 w-6" />
               <span className="sr-only">Settings</span>
             </Button>
