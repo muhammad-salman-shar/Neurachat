@@ -6,7 +6,7 @@ import { Heart, BrainCircuit, Briefcase, Handshake, ShieldCheck, Dumbbell, Zap, 
 import Link from "next/link";
 
 const agents = [
-    { name: "Friend Agent", mood: "Chill", icon: <Handshake />, avatar: "https://placehold.co/100x100.png", hint: "friendly person", status: "Online - 'Bhai bored lag raha?'", active: true, emoji: "😁" },
+    { name: "Friend Agent", mood: "Chill", icon: "😁", avatar: "https://placehold.co/100x100.png", hint: "friendly person", status: "Online - 'Bhai bored lag raha?'", active: true, emoji: "😁" },
     { name: "Teacher Agent", mood: "Strict", icon: <BrainCircuit />, avatar: "https://placehold.co/100x100.png", hint: "teacher woman", status: "Next Quiz - 'Kal revise kiya?'", active: true, emoji: "📝" },
     { name: "Boss Agent", mood: "Professional", icon: <Briefcase />, avatar: "https://placehold.co/100x100.png", hint: "business man", status: "Focus on your goals!", active: false, emoji: "💼" },
     { name: "Girlfriend Agent", mood: "Caring", icon: <Heart />, avatar: "https://placehold.co/100x100.png", hint: "happy woman", status: "How was your day?", active: true, emoji: "🥰" },
