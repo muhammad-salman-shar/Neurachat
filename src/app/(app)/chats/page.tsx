@@ -1,10 +1,14 @@
+
+"use client";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { useEffect, useState } from "react";
 
-const chats = [
+const initialChats = [
     { name: "Friend", message: "Of course bro, looking awesome!", avatar: "https://placehold.co/100x100.png", hint: "cool emoji", unread: true, emoji: "😁" },
     { name: "Teacher", message: "Next quiz aa raha hai, kal revise kiya?", avatar: "https://placehold.co/100x100.png", hint: "teacher woman", time: "4:20 PM", emoji: "📝" },
     { name: "Boss", message: "Project abhi tak complete hua?", avatar: "https://placehold.co/100x100.png", hint: "business man", time: "11:15 AM", emoji: "💼" },
@@ -12,13 +16,33 @@ const chats = [
     { name: "Girlfriend", message: "How was your day?", avatar: "https://placehold.co/100x100.png", hint: "happy woman", time: "Yesterday", emoji: "🥰" },
 ];
 
+type Chat = {
+    name: string;
+    message: string;
+    avatar: string;
+    hint: string;
+    unread?: boolean;
+    emoji: string;
+    time?: string;
+    isGroup?: boolean;
+}
 
 export default function ChatsPage() {
+    const [chats, setChats] = useState<Chat[]>(initialChats);
+
+    useEffect(() => {
+        const storedChats = JSON.parse(localStorage.getItem("chats") || "[]");
+        setChats(prevChats => [...prevChats, ...storedChats]);
+
+        // Clean up local storage so groups are not added again on page refresh
+        localStorage.removeItem("chats");
+    }, []);
+
     return (
         <div className="relative h-[calc(100vh-10rem)]">
             <div className="space-y-2">
-                {chats.map((chat) => (
-                     <Link href={`/chat-detail?agent=${encodeURIComponent(chat.name)}&emoji=${encodeURIComponent(chat.emoji)}`} key={chat.name} className="block hover:no-underline">
+                {chats.map((chat, index) => (
+                     <Link href={`/chat-detail?agent=${encodeURIComponent(chat.name)}&emoji=${encodeURIComponent(chat.emoji)}`} key={`${chat.name}-${index}`} className="block hover:no-underline">
                         <div className="flex items-center gap-4 p-3 rounded-2xl hover:bg-card transition-colors cursor-pointer">
                             <div className="relative">
                                 <Avatar className="h-14 w-14">
@@ -33,7 +57,7 @@ export default function ChatsPage() {
                             </div>
                             <div className="text-right">
                                  {chat.time && <p className="text-xs text-muted-foreground">{chat.time}</p>}
-                                 {chat.unread && <Badge className="mt-1 bg-primary h-6 w-6 flex items-center justify-center p-0"></Badge>}
+                                 {chat.unread && <Badge className="mt-1 bg-primary h-6 w-6 flex items-center justify-center p-0">{chat.isGroup ? '' : '1'}</Badge>}
                             </div>
                         </div>
                     </Link>

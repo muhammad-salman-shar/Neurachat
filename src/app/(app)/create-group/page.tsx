@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Camera, Contact, User, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const agents = [
     { name: "Friend Agent", avatar: "https://placehold.co/100x100.png", hint: "friendly person" },
@@ -36,6 +37,7 @@ export default function CreateGroupPage() {
     const [isContactsApiSupported, setIsContactsApiSupported] = useState(false);
     const [isRunningInIframe, setIsRunningInIframe] = useState(false);
     const imageInputRef = useRef<HTMLInputElement>(null);
+    const router = useRouter();
 
     useEffect(() => {
         const inIframe = window.self !== window.top;
@@ -82,8 +84,43 @@ export default function CreateGroupPage() {
             return newSet;
         });
     };
+
+     const toggleContactSelection = (contactName: string) => {
+        setSelectedContacts(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(contactName)) {
+                newSet.delete(contactName);
+            } else {
+                newSet.add(contactName);
+            }
+            return newSet;
+        });
+    };
     
     const isSyncDisabled = !isContactsApiSupported || isRunningInIframe;
+
+    const handleCreateGroup = () => {
+        if (!groupName) {
+            alert("Please enter a group name.");
+            return;
+        }
+
+        const newGroup = {
+            name: groupName,
+            avatar: groupImage || "https://placehold.co/100x100.png",
+            hint: "group icon",
+            message: `${[...selectedAgents, ...selectedContacts].slice(0, 2).join(', ')} and others`,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            isGroup: true,
+            emoji: "👥",
+            unread: true,
+        };
+
+        const existingChats = JSON.parse(localStorage.getItem("chats") || "[]");
+        localStorage.setItem("chats", JSON.stringify([...existingChats, newGroup]));
+
+        router.push('/chats');
+    };
 
     return (
         <div className="h-[calc(100vh-10rem)] flex flex-col">
@@ -139,7 +176,9 @@ export default function CreateGroupPage() {
                 </div>
                  <div className="space-y-1">
                     {phoneContacts.length > 0 ? (
-                        phoneContacts.map((contact, index) => (
+                        phoneContacts.map((contact, index) => {
+                           const contactName = contact.name ? contact.name[0] : `Contact ${index}`;
+                           return (
                            <Label key={index} className="flex items-center gap-4 p-3 rounded-2xl hover:bg-card transition-colors cursor-pointer">
                                 <Avatar className="h-12 w-12">
                                     {contact.icon && contact.icon.length > 0 ? (
@@ -149,10 +188,14 @@ export default function CreateGroupPage() {
                                     )}
                                     <AvatarFallback>{contact.name ? contact.name[0].charAt(0) : '?'}</AvatarFallback>
                                 </Avatar>
-                                <p className="font-bold text-lg text-foreground flex-1">{contact.name ? contact.name[0] : "No Name"}</p>
-                                <Checkbox />
+                                <p className="font-bold text-lg text-foreground flex-1">{contactName}</p>
+                                <Checkbox 
+                                  checked={selectedContacts.has(contactName)}
+                                  onCheckedChange={() => toggleContactSelection(contactName)}
+                                />
                             </Label>
-                        ))
+                           )
+                        })
                     ) : (
                        <p className="text-sm text-muted-foreground px-4 py-2">
                          {isSyncDisabled
@@ -163,7 +206,7 @@ export default function CreateGroupPage() {
                 </div>
             </ScrollArea>
              <div className="mt-4">
-                <Button className="w-full" size="lg">Create Group</Button>
+                <Button className="w-full" size="lg" onClick={handleCreateGroup}>Create Group</Button>
             </div>
         </div>
     );
