@@ -19,6 +19,7 @@ const settingsOptions = [
     { id: "cloud-sync", icon: DatabaseZap, title: "Memory & Cloud", description: "Storage use, clean/delete option", action: "switch" },
     { id: "privacy", icon: ShieldCheck, title: "Privacy", description: "Data encryption, manual delete", action: "button", actionText: "View Options" },
     { id: "smart-notifications", icon: BellRing, title: "Smart Notifications", description: "Enable or disable smart notifications", action: "switch" },
+    { id: "reminders", icon: CalendarIcon, title: "Reminders", description: "View and manage your reminders", action: "none" },
     { id: "dark-mode", icon: Wand, title: "Theme", description: "Light/Dark mode, color customizations", action: "switch" },
     { id: "video-generation", icon: Clapperboard, title: "Logo Animation", description: "Generate a cinematic logo animation", action: "link", href: "/video-generation" },
     { id: "about", icon: Info, title: "About", description: "Version 1.0.0, check for updates", action: "none" },
