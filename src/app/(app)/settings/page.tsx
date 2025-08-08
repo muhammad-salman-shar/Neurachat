@@ -3,11 +3,10 @@
 
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
-import { User, Cpu, DatabaseZap, ShieldCheck, Wand, Info, BellRing, CalendarIcon } from "lucide-react"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { User, DatabaseZap, ShieldCheck, Wand, Info, BellRing, CalendarIcon, Mic, MessageSquare, Video } from "lucide-react"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -73,10 +72,68 @@ function EditProfileDialog() {
                 </div>
             </div>
             <DialogFooter>
-                <Button type="submit" onClick={handleSave}>Save changes</Button>
+                 <DialogClose asChild>
+                    <Button type="submit" onClick={handleSave}>Save changes</Button>
+                </DialogClose>
             </DialogFooter>
         </DialogContent>
     )
+}
+
+function PrivacySettingsDialog() {
+    const [textTraining, setTextTraining] = useState(true);
+    const [videoTraining, setVideoTraining] = useState(false);
+    const [voiceTraining, setVoiceTraining] = useState(false);
+    const { toast } = useToast();
+
+    const handleSave = () => {
+        toast({
+            title: "Privacy Settings Updated",
+            description: "Your choices have been saved.",
+        });
+    };
+
+    return (
+        <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+                <DialogTitle>Privacy Settings</DialogTitle>
+                <DialogDescription>
+                    Manage how your data is used to improve our AI models. Your privacy is important to us.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                    <div className="flex items-center gap-3">
+                       <MessageSquare className="h-5 w-5 text-muted-foreground" />
+                       <Label htmlFor="text-training" className="font-semibold cursor-pointer">Model Text Training</Label>
+                    </div>
+                    <Switch id="text-training" checked={textTraining} onCheckedChange={setTextTraining} />
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                   <div className="flex items-center gap-3">
+                       <Video className="h-5 w-5 text-muted-foreground" />
+                       <Label htmlFor="video-training" className="font-semibold cursor-pointer">Model Video Training</Label>
+                    </div>
+                    <Switch id="video-training" checked={videoTraining} onCheckedChange={setVideoTraining} />
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                    <div className="flex items-center gap-3">
+                        <Mic className="h-5 w-5 text-muted-foreground" />
+                        <Label htmlFor="voice-training" className="font-semibold cursor-pointer">Voice Call Model Training</Label>
+                    </div>
+                    <Switch id="voice-training" checked={voiceTraining} onCheckedChange={setVoiceTraining} />
+                </div>
+            </div>
+            <DialogFooter>
+                <DialogClose asChild>
+                    <Button type="button" variant="secondary">Cancel</Button>
+                </DialogClose>
+                <DialogClose asChild>
+                    <Button onClick={handleSave}>Save</Button>
+                </DialogClose>
+            </DialogFooter>
+        </DialogContent>
+    );
 }
 
 
@@ -84,14 +141,14 @@ export default function SettingsPage() {
     return (
         <Card className="border-border/60">
             <CardHeader>
-                <CardTitle>Settings</CardTitle>
+                <CardTitle>NeuraSaMu</CardTitle>
                 <CardDescription>Manage your NeuraSaMu experience.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="divide-y divide-border/60">
+                <div className="divide-y divide-border/60 -mx-6">
                     {settingsOptions.map((option) => {
                        const content = (
-                         <div className="py-4 flex items-center justify-between">
+                         <div className="py-4 flex items-center justify-between px-6">
                             <div className="flex items-center gap-4">
                                 <option.icon className="h-6 w-6 text-primary" />
                                 <div>
@@ -107,6 +164,13 @@ export default function SettingsPage() {
                                         </DialogTrigger>
                                         <EditProfileDialog />
                                     </Dialog>
+                                ) : option.id === 'privacy' ? (
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <Button variant="outline">{option.actionText}</Button>
+                                        </DialogTrigger>
+                                        <PrivacySettingsDialog />
+                                    </Dialog>
                                 ) : option.action === 'button' ? (
                                     <Button variant="outline">{option.actionText}</Button>
                                 ) : option.action === 'switch' ? (
@@ -118,7 +182,7 @@ export default function SettingsPage() {
 
                        if (option.action === 'link' && option.href) {
                          return (
-                           <Link href={option.href} key={option.id} className="block hover:bg-card/50 -mx-6 px-6 rounded-lg">
+                           <Link href={option.href} key={option.id} className="block hover:bg-card/50">
                                {content}
                            </Link>
                          )
