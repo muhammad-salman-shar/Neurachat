@@ -18,6 +18,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '20mb', // Increase body size limit for video data
+    },
+  },
+  // Increase server action timeout to 2 minutes for video generation
+  serverActions: {
+    bodySizeLimit: '20mb',
+  },
 };
 
 export default nextConfig;

@@ -6,12 +6,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
-import { User, Cpu, DatabaseZap, ShieldCheck, Wand, Info, BellRing, CalendarIcon } from "lucide-react"
+import { User, Cpu, DatabaseZap, ShieldCheck, Wand, Info, BellRing, CalendarIcon, Clapperboard } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
+import Link from "next/link"
 
 const settingsOptions = [
     { id: "account", icon: User, title: "Account", description: "Profile pic, name, status", action: "button", actionText: "Edit Profile" },
@@ -19,6 +20,7 @@ const settingsOptions = [
     { id: "privacy", icon: ShieldCheck, title: "Privacy", description: "Data encryption, manual delete", action: "button", actionText: "View Options" },
     { id: "smart-notifications", icon: BellRing, title: "Smart Notifications", description: "Enable or disable smart notifications", action: "switch" },
     { id: "dark-mode", icon: Wand, title: "Theme", description: "Light/Dark mode, color customizations", action: "switch" },
+    { id: "video-generation", icon: Clapperboard, title: "Logo Animation", description: "Generate a cinematic logo animation", action: "link", href: "/video-generation" },
     { id: "about", icon: Info, title: "About", description: "Version 1.0.0, check for updates", action: "none" },
 ];
 
@@ -97,7 +99,11 @@ export default function SettingsPage() {
                                 </div>
                             </div>
                             <div>
-                                {option.id === 'account' ? (
+                                {option.action === 'link' && option.href ? (
+                                    <Button asChild variant="outline">
+                                        <Link href={option.href}>Generate</Link>
+                                    </Button>
+                                ) : option.id === 'account' ? (
                                     <Dialog>
                                         <DialogTrigger asChild>
                                             <Button variant="outline">{option.actionText}</Button>

@@ -1,4 +1,4 @@
-import { MessageSquare, Library, Archive, type LucideIcon } from "lucide-react";
+import { MessageSquare, Library, Archive, Settings, type LucideIcon } from "lucide-react";
 
 type NavItem = {
   href: string;
@@ -25,5 +25,11 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Archive",
     icon: Archive,
     tooltip: "Archived items",
+  },
+   {
+    href: "/settings",
+    label: "Settings",
+    icon: Settings,
+    tooltip: "App settings",
   },
 ];
