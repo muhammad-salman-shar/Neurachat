@@ -18,6 +18,7 @@ export default function Header() {
   const isSettingsPage = pathname === "/settings";
   const isChatDetailPage = pathname === "/chat-detail";
   const isChatsPage = pathname === "/chats";
+  const isRemindersPage = pathname === "/reminders";
 
   useEffect(() => {
     if (isChatsPage) {
@@ -52,11 +53,12 @@ export default function Header() {
     if (pathname === '/settings') pageTitle = "Settings";
     if (pathname === '/new-chat') pageTitle = "New Chat";
     if (pathname === '/create-group') pageTitle = "Create Group";
+    if (pathname === '/reminders') pageTitle = "Reminders";
     
     return <h1 className={cn("text-2xl font-bold", isChatDetailPage ? 'text-header-green-foreground' : 'text-foreground')} style={{ textShadow: isChatDetailPage ? '0 0 5px hsl(var(--primary) / 0.5)' : 'none' }}>{pageTitle}</h1>;
   };
 
-  const showBackButton = isSettingsPage || isChatDetailPage || pathname === '/new-chat' || pathname === '/create-group';
+  const showBackButton = isSettingsPage || isChatDetailPage || pathname === '/new-chat' || pathname === '/create-group' || isRemindersPage;
 
   const AgentSettingsMenu = () => (
     <DropdownMenu>
@@ -116,17 +118,10 @@ export default function Header() {
       </div>
 
       <div className="flex items-center justify-end w-1/4">
-        {isSettingsPage ? (
-          <div className="w-9 h-9" /> // Placeholder to keep title centered
-        ) : isChatDetailPage ? (
+        {isChatDetailPage ? (
            <AgentSettingsMenu />
         ) : (
-          <Link href="/settings">
-            <Button variant="ghost" size="icon">
-              <Settings className="h-6 w-6" />
-              <span className="sr-only">Settings</span>
-            </Button>
-          </Link>
+          <div className="w-9 h-9" /> // Placeholder to keep title centered
         )}
       </div>
     </header>

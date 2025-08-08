@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -80,11 +80,7 @@ export default function RemindersPage() {
   
   return (
     <div className="space-y-6">
-       <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold">Reminders</h1>
-          <p className="text-muted-foreground">All your scheduled tasks and alerts.</p>
-        </div>
+       <div className="flex justify-end items-center">
         <ReminderDialog onSave={addReminder}>
           <Button>
             <Plus className="mr-2 h-4 w-4" />
