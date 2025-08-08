@@ -5,7 +5,7 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
-import { User, DatabaseZap, ShieldCheck, Wand, Info, BellRing, CalendarIcon, Mic, MessageSquare, Video } from "lucide-react"
+import { User, DatabaseZap, ShieldCheck, Wand, Info, BellRing, CalendarIcon, Mic, MessageSquare, Video, LogIn, Mail, KeyRound, Phone, UserPlus, ArrowLeft } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -15,11 +15,11 @@ import Link from "next/link"
 
 const settingsOptions = [
     { id: "account", icon: User, title: "Account", description: "Profile pic, name, status", action: "button", actionText: "Edit Profile" },
+    { id: "login-signup", icon: LogIn, title: "Login & Sign Up", description: "Create an account or sign in", action: "dialog" },
     { id: "cloud-sync", icon: DatabaseZap, title: "Memory & Cloud", description: "Storage use, clean/delete option", action: "switch" },
     { id: "privacy", icon: ShieldCheck, title: "Privacy", description: "Data encryption, manual delete", action: "button", actionText: "View Options" },
     { id: "smart-notifications", icon: BellRing, title: "Smart Notifications", description: "Enable or disable smart notifications", action: "switch" },
     { id: "reminders", icon: CalendarIcon, title: "Reminders", description: "View and manage your reminders", href: "/reminders", action: "link" },
-    { id: "dark-mode", icon: Wand, title: "Theme", description: "Light/Dark mode, color customizations", action: "switch" },
     { id: "about", icon: Info, title: "About", description: "Version 1.0.0, check for updates", action: "none" },
 ];
 
@@ -136,6 +136,115 @@ function PrivacySettingsDialog() {
     );
 }
 
+const GoogleIcon = () => (
+    <svg className="h-5 w-5" viewBox="0 0 48 48">
+        <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path>
+        <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"></path>
+        <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.222 0-9.618-3.67-11.283-8.591l-6.522 5.025C9.505 39.556 16.227 44 24 44z"></path>
+        <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.021 35.591 44 30.134 44 24c0-1.341-.138-2.65-.389-3.917z"></path>
+    </svg>
+);
+
+function LoginSignupDialog() {
+    type AuthStep = 'initial' | 'login' | 'signup' | 'login-userpass';
+    const [step, setStep] = useState<AuthStep>('initial');
+
+    const renderInitial = () => (
+        <>
+            <DialogHeader>
+                <DialogTitle>Join NeuraSaMu</DialogTitle>
+                <DialogDescription>
+                    Create an account or sign in to sync your data across devices.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+                <Button onClick={() => setStep('signup')}><UserPlus className="mr-2"/> New User</Button>
+                <Button variant="secondary" onClick={() => setStep('login')}>Already have an account</Button>
+            </div>
+        </>
+    );
+
+    const renderSignup = () => (
+        <>
+            <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setStep('initial')}><ArrowLeft/></Button>
+                    Create Account
+                </DialogTitle>
+                <DialogDescription>Choose a method to sign up.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+                <Button variant="outline"><Mail className="mr-2"/>Sign up with Email</Button>
+                <Button variant="outline"><GoogleIcon/>Sign up with Google</Button>
+                <Button variant="outline"><Phone className="mr-2"/>Sign up with Phone Number</Button>
+            </div>
+        </>
+    );
+    
+    const renderLogin = () => (
+        <>
+            <DialogHeader>
+                 <DialogTitle className="flex items-center gap-2">
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setStep('initial')}><ArrowLeft/></Button>
+                    Log In
+                </DialogTitle>
+                <DialogDescription>Welcome back! Sign in to continue.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+                <Button variant="outline" onClick={() => setStep('login-userpass')}><KeyRound className="mr-2"/>Login with Username</Button>
+                <Button variant="outline"><GoogleIcon/>Login with Google</Button>
+            </div>
+        </>
+    );
+
+    const renderLoginUserPass = () => (
+         <>
+            <DialogHeader>
+                 <DialogTitle className="flex items-center gap-2">
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setStep('login')}><ArrowLeft/></Button>
+                    Welcome Back
+                </DialogTitle>
+                <DialogDescription>Enter your credentials to access your account.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+                 <div className="grid gap-2">
+                    <Label htmlFor="email">Email or Username</Label>
+                    <Input id="email" type="email" placeholder="sam@example.com" required />
+                </div>
+                 <div className="grid gap-2">
+                     <div className="flex items-center justify-between">
+                        <Label htmlFor="password">Password</Label>
+                        <a href="#" className="text-sm text-primary hover:underline">Forgot password?</a>
+                    </div>
+                    <Input id="password" type="password" required />
+                </div>
+            </div>
+            <DialogFooter>
+                <DialogClose asChild>
+                    <Button className="w-full">Log In</Button>
+                </DialogClose>
+            </DialogFooter>
+        </>
+    );
+
+    const renderStep = () => {
+        switch (step) {
+            case 'signup': return renderSignup();
+            case 'login': return renderLogin();
+            case 'login-userpass': return renderLoginUserPass();
+            case 'initial':
+            default:
+                return renderInitial();
+        }
+    }
+
+    return (
+        <DialogContent className="sm:max-w-md">
+            {renderStep()}
+        </DialogContent>
+    );
+}
+
 
 export default function SettingsPage() {
     return (
@@ -171,10 +280,17 @@ export default function SettingsPage() {
                                         </DialogTrigger>
                                         <PrivacySettingsDialog />
                                     </Dialog>
+                                ) : option.id === 'login-signup' ? (
+                                     <Dialog>
+                                        <DialogTrigger asChild>
+                                            <Button variant="outline">Manage</Button>
+                                        </DialogTrigger>
+                                        <LoginSignupDialog />
+                                    </Dialog>
                                 ) : option.action === 'button' ? (
                                     <Button variant="outline">{option.actionText}</Button>
                                 ) : option.action === 'switch' ? (
-                                    <Switch id={option.id} defaultChecked={option.id === 'smart-notifications'} />
+                                    <Switch id={option.id} defaultChecked={option.id === 'smart-notifications' || option.id === 'cloud-sync'} />
                                 ) : null}
                             </div>
                          </div>
