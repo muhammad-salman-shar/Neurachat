@@ -19,7 +19,7 @@ const settingsOptions = [
     { id: "cloud-sync", icon: DatabaseZap, title: "Memory & Cloud", description: "Storage use, clean/delete option", action: "switch" },
     { id: "privacy", icon: ShieldCheck, title: "Privacy", description: "Data encryption, manual delete", action: "button", actionText: "View Options" },
     { id: "smart-notifications", icon: BellRing, title: "Smart Notifications", description: "Enable or disable smart notifications", action: "switch" },
-    { id: "reminders", icon: CalendarIcon, title: "Reminders", description: "View and manage your reminders", action: "none" },
+    { id: "reminders", icon: CalendarIcon, title: "Reminders", description: "View and manage your reminders", href: "/reminders", action: "link" },
     { id: "dark-mode", icon: Wand, title: "Theme", description: "Light/Dark mode, color customizations", action: "switch" },
     { id: "about", icon: Info, title: "About", description: "Version 1.0.0, check for updates", action: "none" },
 ];
@@ -89,8 +89,9 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent>
                 <div className="divide-y divide-border/60">
-                    {settingsOptions.map((option) => (
-                        <div key={option.id} className="py-4 flex items-center justify-between">
+                    {settingsOptions.map((option) => {
+                       const content = (
+                         <div className="py-4 flex items-center justify-between">
                             <div className="flex items-center gap-4">
                                 <option.icon className="h-6 w-6 text-primary" />
                                 <div>
@@ -112,8 +113,23 @@ export default function SettingsPage() {
                                     <Switch id={option.id} defaultChecked={option.id === 'smart-notifications'} />
                                 ) : null}
                             </div>
-                        </div>
-                    ))}
+                         </div>
+                       );
+
+                       if (option.action === 'link' && option.href) {
+                         return (
+                           <Link href={option.href} key={option.id} className="block hover:bg-card/50 -mx-6 px-6 rounded-lg">
+                               {content}
+                           </Link>
+                         )
+                       }
+
+                       return (
+                         <div key={option.id}>
+                           {content}
+                         </div>
+                       )
+                    })}
                 </div>
             </CardContent>
         </Card>
