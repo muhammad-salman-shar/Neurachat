@@ -132,20 +132,19 @@ function ChatContent() {
                       message.sender === "user" && "flex-row-reverse"
                     )}
                   >
-                    <Avatar className={cn("h-10 w-10")}>
-                      <AvatarImage src={message.avatar} alt={message.name} data-ai-hint="person face" />
-                      <AvatarFallback>{message.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
+                     {message.sender !== 'user' && (
+                        <Avatar className={cn("h-10 w-10")}>
+                        <AvatarImage src={message.avatar} alt={message.name} data-ai-hint="person face" />
+                        <AvatarFallback>{message.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                     )}
                     <div className={cn("max-w-xs md:max-w-md lg:max-w-lg space-y-1", message.sender === 'user' && 'items-end flex flex-col')}>
-                      <div className="flex items-baseline gap-2" dir={message.sender === 'user' ? 'rtl' : 'ltr'}>
-                        <p className="text-sm font-semibold">{message.name}</p>
-                      </div>
                        <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                            <div
                             className={cn(
                               "rounded-xl px-4 py-2.5 shadow-sm cursor-pointer relative text-foreground",
-                              message.sender === 'user' ? 'bg-primary/10' : 'bg-muted',
+                              message.sender === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted',
                               { 'p-2': message.image && !message.text },
                               isSelected && "ring-2 ring-primary"
                             )}
