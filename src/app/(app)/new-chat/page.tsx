@@ -114,19 +114,25 @@ export default function NewChatPage() {
                 </div>
                 <div className="space-y-1">
                     {phoneContacts.length > 0 ? (
-                        phoneContacts.map((contact, index) => (
-                           <div key={index} className="flex items-center gap-4 p-3 rounded-2xl hover:bg-card transition-colors cursor-pointer">
-                                <Avatar className="h-12 w-12">
-                                    {contact.icon && contact.icon.length > 0 ? (
-                                        <AvatarImage src={contact.icon[0]} data-ai-hint="person face" />
-                                    ) : (
-                                       <AvatarImage src="https://placehold.co/100x100.png" data-ai-hint="person placeholder" />
-                                    )}
-                                    <AvatarFallback>{contact.name ? contact.name[0].charAt(0) : '?'}</AvatarFallback>
-                                </Avatar>
-                                <p className="font-bold text-lg text-foreground">{contact.name ? contact.name[0] : "No Name"}</p>
-                            </div>
-                        ))
+                        phoneContacts.map((contact, index) => {
+                            const contactName = contact.name ? contact.name[0] : `Contact ${index}`;
+                            const contactEmoji = '👤';
+                            return (
+                                <Link href={`/chat-detail?agent=${encodeURIComponent(contactName)}&emoji=${encodeURIComponent(contactEmoji)}`} key={`${contactName}-${index}`} className="block hover:no-underline">
+                                    <div className="flex items-center gap-4 p-3 rounded-2xl hover:bg-card transition-colors cursor-pointer">
+                                        <Avatar className="h-12 w-12">
+                                            {contact.icon && contact.icon.length > 0 ? (
+                                                <AvatarImage src={contact.icon[0]} data-ai-hint="person face" />
+                                            ) : (
+                                            <AvatarImage src="https://placehold.co/100x100.png" data-ai-hint="person placeholder" />
+                                            )}
+                                            <AvatarFallback>{contact.name ? contact.name[0].charAt(0) : '?'}</AvatarFallback>
+                                        </Avatar>
+                                        <p className="font-bold text-lg text-foreground">{contactName}</p>
+                                    </div>
+                                </Link>
+                            )
+                        })
                     ) : (
                        <p className="text-sm text-muted-foreground px-4 py-2">
                          {isSyncDisabled
