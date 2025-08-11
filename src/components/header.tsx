@@ -19,6 +19,8 @@ export default function Header() {
   const isChatDetailPage = pathname === "/chat-detail";
   const isChatsPage = pathname === "/chats";
   const isRemindersPage = pathname === "/reminders";
+  const isCreateGroupPage = pathname === "/create-group";
+  const isNewChatPage = pathname === "/new-chat";
 
   useEffect(() => {
     if (isChatsPage) {
@@ -55,15 +57,15 @@ export default function Header() {
     if (pathname === '/create-group') pageTitle = "Create Group";
     if (pathname === '/reminders') pageTitle = "Reminders";
     
-    return <h1 className={cn("text-2xl font-bold", isChatDetailPage ? 'text-header-green-foreground' : 'text-foreground')} style={{ textShadow: isChatDetailPage ? '0 0 5px hsl(var(--primary) / 0.5)' : 'none' }}>{pageTitle}</h1>;
+    return <h1 className={cn("text-2xl font-bold", isChatDetailPage ? 'text-header-pink-neon-foreground' : 'text-foreground')}>{pageTitle}</h1>;
   };
 
-  const showBackButton = isSettingsPage || isChatDetailPage || pathname === '/new-chat' || pathname === '/create-group' || isRemindersPage;
+  const showBackButton = isSettingsPage || isChatDetailPage || isNewChatPage || isCreateGroupPage || isRemindersPage;
 
   const AgentSettingsMenu = () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className={cn(isChatDetailPage && 'hover:bg-black/10')}>
+        <Button variant="ghost" size="icon" className={cn(isChatDetailPage && 'hover:bg-black/10 text-header-pink-neon-foreground')}>
           <Settings className="h-6 w-6" />
           <span className="sr-only">Agent Settings</span>
         </Button>
@@ -101,15 +103,20 @@ export default function Header() {
   );
 
   return (
-    <header className={cn("flex h-16 items-center justify-between gap-4 px-4 md:px-6 sticky top-0 z-30", isChatDetailPage ? "bg-header-green text-header-green-foreground" : "bg-card text-card-foreground border-b")}>
+    <header className={cn(
+      "flex h-16 items-center justify-between gap-4 px-4 md:px-6 sticky top-0 z-30", 
+      isChatDetailPage 
+        ? "bg-header-pink-neon text-header-pink-neon-foreground animate-neon-glow" 
+        : "bg-card text-card-foreground border-b"
+    )}>
       <div className="flex items-center gap-2 w-1/4">
         {showBackButton ? (
-          <Button variant="ghost" size="icon" onClick={() => router.back()} className={cn(isChatDetailPage && 'hover:bg-black/10')}>
+          <Button variant="ghost" size="icon" onClick={() => router.back()} className={cn(isChatDetailPage && 'hover:bg-black/10 text-header-pink-neon-foreground')}>
             <ChevronLeft className="h-6 w-6" />
             <span className="sr-only">Back</span>
           </Button>
         ) : (
-          <div></div> // Placeholder for alignment
+          <div className="w-9 h-9"></div> // Placeholder for alignment
         )}
       </div>
 

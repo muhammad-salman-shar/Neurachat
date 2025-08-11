@@ -65,9 +65,9 @@ export default {
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))',
         },
-        'header-green': {
-          DEFAULT: 'hsl(var(--header-green))',
-          foreground: 'hsl(var(--header-green-foreground))',
+        'header-pink-neon': {
+          DEFAULT: 'hsl(var(--header-pink-neon))',
+          foreground: 'hsl(var(--header-pink-neon-foreground))',
         },
       },
       borderRadius: {
@@ -126,6 +126,14 @@ export default {
             transform: 'scale(1.2)',
           },
         },
+        'neon-glow': {
+          '0%, 100%': {
+            'box-shadow': '0 0 5px hsl(var(--header-pink-neon)), 0 0 10px hsl(var(--header-pink-neon))',
+          },
+          '50%': {
+            'box-shadow': '0 0 15px hsl(var(--header-pink-neon)), 0 0 25px hsl(var(--header-pink-neon))',
+          },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -134,6 +142,7 @@ export default {
         'fade-in-long': 'fade-in-long 3s ease-in-out forwards',
         'splash-in': 'splash-in 1.5s ease-out forwards',
         'splash-out': 'splash-out 1s ease-in forwards',
+        'neon-glow': 'neon-glow 2.5s ease-in-out infinite',
       },
     },
   },
