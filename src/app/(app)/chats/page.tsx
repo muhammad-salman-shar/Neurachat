@@ -31,11 +31,24 @@ export default function ChatsPage() {
     const [chats, setChats] = useState<Chat[]>(initialChats);
 
     useEffect(() => {
-        const storedChats = JSON.parse(localStorage.getItem("chats") || "[]");
-        setChats(prevChats => [...prevChats, ...storedChats]);
+        try {
+            const storedChatsItem = localStorage.getItem("chats");
+            if (storedChatsItem) {
+                const storedChats = JSON.parse(storedChatsItem);
+                
+                // Filter out duplicates before adding
+                const newChats = storedChats.filter((newChat: Chat) => 
+                    !initialChats.some(existingChat => existingChat.name === newChat.name) &&
+                    !chats.some(existingChat => existingChat.name === newChat.name)
+                );
 
-        // Clean up local storage so groups are not added again on page refresh
-        localStorage.removeItem("chats");
+                if (newChats.length > 0) {
+                     setChats(prevChats => [...prevChats, ...newChats]);
+                }
+            }
+        } catch (error) {
+            console.error("Failed to parse chats from localStorage", error);
+        }
     }, []);
 
     return (

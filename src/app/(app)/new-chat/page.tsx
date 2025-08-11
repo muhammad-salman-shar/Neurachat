@@ -10,6 +10,8 @@ import { Separator } from "@/components/ui/separator";
 import { UserPlus, Users, Search, Contact } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 
 const agents = [
     { name: "Friend Agent", avatar: "https://placehold.co/100x100.png", hint: "friendly person", emoji: "😁" },
@@ -31,6 +33,8 @@ export default function NewChatPage() {
     const [phoneContacts, setPhoneContacts] = useState<Contact[]>([]);
     const [isContactsApiSupported, setIsContactsApiSupported] = useState(false);
     const [isRunningInIframe, setIsRunningInIframe] = useState(false);
+    const router = useRouter();
+
 
     useEffect(() => {
         const inIframe = window.self !== window.top;
@@ -55,6 +59,29 @@ export default function NewChatPage() {
         } catch (error) {
             console.error("Error picking contacts:", error);
         }
+    };
+
+    const handleContactClick = (contact: Contact) => {
+        const contactName = contact.name ? contact.name[0] : `Contact`;
+        const newChat = {
+            name: contactName,
+            avatar: contact.icon && contact.icon.length > 0 ? contact.icon[0] : "https://placehold.co/100x100.png",
+            hint: "person face",
+            message: `You are now connected with ${contactName}`,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            emoji: "👤",
+            unread: true,
+        };
+
+        const existingChats = JSON.parse(localStorage.getItem("chats") || "[]");
+        
+        const isAlreadyAdded = existingChats.some((chat: any) => chat.name === contactName);
+
+        if (!isAlreadyAdded) {
+            localStorage.setItem("chats", JSON.stringify([...existingChats, newChat]));
+        }
+        
+        router.push(`/chat-detail?agent=${encodeURIComponent(contactName)}&emoji=${encodeURIComponent('👤')}`);
     };
 
     const isSyncDisabled = !isContactsApiSupported || isRunningInIframe;
@@ -116,9 +143,8 @@ export default function NewChatPage() {
                     {phoneContacts.length > 0 ? (
                         phoneContacts.map((contact, index) => {
                             const contactName = contact.name ? contact.name[0] : `Contact ${index}`;
-                            const contactEmoji = '👤';
                             return (
-                                <Link href={`/chat-detail?agent=${encodeURIComponent(contactName)}&emoji=${encodeURIComponent(contactEmoji)}`} key={`${contactName}-${index}`} className="block hover:no-underline">
+                                <div key={`${contactName}-${index}`} className="block hover:no-underline" onClick={() => handleContactClick(contact)}>
                                     <div className="flex items-center gap-4 p-3 rounded-2xl hover:bg-card transition-colors cursor-pointer">
                                         <Avatar className="h-12 w-12">
                                             {contact.icon && contact.icon.length > 0 ? (
@@ -130,7 +156,7 @@ export default function NewChatPage() {
                                         </Avatar>
                                         <p className="font-bold text-lg text-foreground">{contactName}</p>
                                     </div>
-                                </Link>
+                                </div>
                             )
                         })
                     ) : (
