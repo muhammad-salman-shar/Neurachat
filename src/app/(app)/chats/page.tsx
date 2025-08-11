@@ -5,19 +5,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Archive, Check, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+import { cn } from "@/lib/utils";
 
 
 const initialChats = [
@@ -42,7 +32,9 @@ type Chat = {
 
 export default function ChatsPage() {
     const [chats, setChats] = useState<Chat[]>(initialChats);
-    const [longPressedChat, setLongPressedChat] = useState<Chat | null>(null);
+    const [selectedChats, setSelectedChats] = useState<Set<string>>(new Set());
+
+    const inSelectionMode = selectedChats.size > 0;
 
     useEffect(() => {
         try {
@@ -64,74 +56,127 @@ export default function ChatsPage() {
         }
     }, []);
 
-    const handleDeleteChat = () => {
-        if (!longPressedChat) return;
+    const toggleSelection = (chatName: string) => {
+        setSelectedChats(prev => {
+            const newSelection = new Set(prev);
+            if (newSelection.has(chatName)) {
+                newSelection.delete(chatName);
+            } else {
+                newSelection.add(chatName);
+            }
+            return newSelection;
+        });
+    };
 
-        const updatedChats = chats.filter(chat => chat.name !== longPressedChat.name);
+    const handleChatClick = (e: React.MouseEvent, chatName: string) => {
+        if (inSelectionMode) {
+            e.preventDefault();
+            toggleSelection(chatName);
+        }
+    };
+
+    const handleDeleteSelected = () => {
+        const updatedChats = chats.filter(chat => !selectedChats.has(chat.name));
         setChats(updatedChats);
 
         // Also update localStorage if needed
-        const storedChats = JSON.parse(localStorage.getItem("chats") || "[]");
-        const updatedStoredChats = storedChats.filter((chat: Chat) => chat.name !== longPressedChat.name);
-        localStorage.setItem("chats", JSON.stringify(updatedStoredChats));
+        try {
+            const storedChats = JSON.parse(localStorage.getItem("chats") || "[]");
+            const updatedStoredChats = storedChats.filter((chat: Chat) => !selectedChats.has(chat.name));
+            localStorage.setItem("chats", JSON.stringify(updatedStoredChats));
+        } catch (error) {
+             console.error("Failed to update chats in localStorage", error);
+        }
 
-        setLongPressedChat(null);
+        setSelectedChats(new Set());
+    };
+    
+    const handleArchiveSelected = () => {
+        // Placeholder for archive logic
+        alert(`${selectedChats.size} chats archived!`);
+        setSelectedChats(new Set());
     };
 
-    return (
-        <div className="relative h-[calc(100vh-10rem)]">
-            <div className="space-y-2">
-                {chats.map((chat, index) => (
-                     <AlertDialog key={`${chat.name}-${index}`}>
-                        <AlertDialogTrigger asChild>
-                             <div onContextMenu={(e) => { e.preventDefault(); setLongPressedChat(chat); }}>
-                                <Link href={`/chat-detail?agent=${encodeURIComponent(chat.name)}&emoji=${encodeURIComponent(chat.emoji)}&avatar=${encodeURIComponent(chat.avatar)}&phone=${encodeURIComponent(chat.phone || '')}`} className="block hover:no-underline">
-                                    <div className="flex items-center gap-4 p-3 rounded-2xl hover:bg-card transition-colors cursor-pointer">
-                                        <div className="relative">
-                                            <Avatar className="h-14 w-14 text-2xl">
-                                                <AvatarImage src={chat.avatar} data-ai-hint={chat.hint} />
-                                                <AvatarFallback>{chat.emoji}</AvatarFallback>
-                                            </Avatar>
-                                            {chat.unread && <span className="absolute bottom-0 right-0 block h-3.5 w-3.5 rounded-full bg-green-500 border-2 border-background"></span>}
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="font-bold text-lg text-foreground">{chat.name}</p>
-                                            <p className="text-sm text-muted-foreground truncate">{chat.message}</p>
-                                        </div>
-                                        <div className="text-right">
-                                             {chat.time && <p className="text-xs text-muted-foreground">{chat.time}</p>}
-                                             {chat.unread && <Badge className="mt-1 bg-primary h-6 w-6 flex items-center justify-center p-0">{chat.isGroup ? '' : '1'}</Badge>}
-                                        </div>
-                                    </div>
-                                </Link>
-                            </div>
-                        </AlertDialogTrigger>
-                        {longPressedChat && longPressedChat.name === chat.name && (
-                             <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>Delete Chat?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        Are you sure you want to delete the chat with {chat.name}? This action cannot be undone.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel onClick={() => setLongPressedChat(null)}>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={handleDeleteChat} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                        <Trash2 className="mr-2 h-4 w-4" />
-                                        Delete
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        )}
-                     </AlertDialog>
-                ))}
-            </div>
-            <Button asChild className="fixed bottom-24 right-6 h-16 w-16 rounded-full shadow-lg">
-                <Link href="/new-chat">
-                    <Plus className="h-8 w-8" />
-                    <span className="sr-only">New Chat</span>
-                </Link>
+    const handleMarkAsReadSelected = () => {
+        const updatedChats = chats.map(chat => {
+            if (selectedChats.has(chat.name)) {
+                return { ...chat, unread: false };
+            }
+            return chat;
+        });
+        setChats(updatedChats);
+        setSelectedChats(new Set());
+    };
+
+    const SelectionHeader = () => (
+         <div className="flex items-center justify-between p-2 bg-card mb-2 rounded-xl sticky top-16 z-10 shadow">
+            <Button variant="ghost" size="icon" onClick={() => setSelectedChats(new Set())}>
+                <X className="h-5 w-5" />
             </Button>
+            <span className="font-semibold">{selectedChats.size} selected</span>
+            <div className="flex items-center">
+                 <Button variant="ghost" size="icon" onClick={handleMarkAsReadSelected}>
+                    <Check className="h-5 w-5" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={handleArchiveSelected}>
+                    <Archive className="h-5 w-5" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={handleDeleteSelected}>
+                    <Trash2 className="h-5 w-5 text-destructive" />
+                </Button>
+            </div>
+        </div>
+    );
+
+    return (
+        <div className="relative h-full">
+            {inSelectionMode && <SelectionHeader />}
+            <div className={cn("space-y-2", inSelectionMode && "pt-2")}>
+                {chats.map((chat, index) => {
+                    const isSelected = selectedChats.has(chat.name);
+                    return (
+                        <div
+                            key={`${chat.name}-${index}`}
+                            onContextMenu={(e) => { e.preventDefault(); toggleSelection(chat.name); }}
+                            onClick={(e) => handleChatClick(e, chat.name)}
+                            className={cn("rounded-2xl transition-colors", isSelected && "bg-primary/10")}
+                        >
+                            <Link href={`/chat-detail?agent=${encodeURIComponent(chat.name)}&emoji=${encodeURIComponent(chat.emoji)}&avatar=${encodeURIComponent(chat.avatar)}&phone=${encodeURIComponent(chat.phone || '')}`} className="block hover:no-underline">
+                                <div className="flex items-center gap-4 p-3 rounded-2xl hover:bg-card">
+                                    <div className="relative">
+                                        <Avatar className="h-14 w-14 text-2xl">
+                                            <AvatarImage src={chat.avatar} data-ai-hint={chat.hint} />
+                                            <AvatarFallback>{chat.emoji}</AvatarFallback>
+                                        </Avatar>
+                                        {chat.unread && !isSelected && <span className="absolute bottom-0 right-0 block h-3.5 w-3.5 rounded-full bg-green-500 border-2 border-background"></span>}
+                                        {isSelected && (
+                                            <div className="absolute top-0 left-0 h-full w-full bg-black/50 rounded-full flex items-center justify-center">
+                                                <Check className="h-7 w-7 text-white" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="font-bold text-lg text-foreground">{chat.name}</p>
+                                        <p className="text-sm text-muted-foreground truncate">{chat.message}</p>
+                                    </div>
+                                    <div className="text-right">
+                                         {chat.time && <p className="text-xs text-muted-foreground">{chat.time}</p>}
+                                         {chat.unread && <Badge className="mt-1 bg-primary h-6 w-6 flex items-center justify-center p-0">{chat.isGroup ? '' : '1'}</Badge>}
+                                    </div>
+                                </div>
+                            </Link>
+                        </div>
+                    )
+                })}
+            </div>
+            {!inSelectionMode && (
+                <Button asChild className="fixed bottom-24 right-6 h-16 w-16 rounded-full shadow-lg">
+                    <Link href="/new-chat">
+                        <Plus className="h-8 w-8" />
+                        <span className="sr-only">New Chat</span>
+                    </Link>
+                </Button>
+            )}
         </div>
     );
 }
