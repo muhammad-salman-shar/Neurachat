@@ -27,6 +27,8 @@ function ChatContent() {
   const searchParams = useSearchParams();
   const agentName = searchParams.get('agent') || 'AI Companion';
   const agentEmoji = searchParams.get('emoji') || '🤖';
+  const agentAvatar = searchParams.get('avatar') || 'https://placehold.co/100x100.png';
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [selectedMessages, setSelectedMessages] = useState<Set<string>>(new Set());
@@ -134,7 +136,7 @@ function ChatContent() {
                   >
                      {message.sender !== 'user' && (
                         <Avatar className={cn("h-10 w-10")}>
-                        <AvatarImage src={message.avatar} alt={message.name} data-ai-hint="person face" />
+                        <AvatarImage src={agentAvatar} alt={message.name} data-ai-hint="person face" />
                         <AvatarFallback>{message.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                      )}

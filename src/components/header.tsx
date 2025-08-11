@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Settings, ChevronLeft, Bot, Palette, Trash2, ShieldAlert } from "lucide-react";
+import { Settings, ChevronLeft, Bot, Palette, Trash2, ShieldAlert, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -32,6 +32,9 @@ export default function Header() {
 
 
   const agentName = searchParams.get('agent');
+  const agentAvatar = searchParams.get('avatar');
+  const agentPhone = searchParams.get('phone');
+
 
   const getTitle = () => {
     if (isChatDetailPage && agentName) {
@@ -54,6 +57,7 @@ export default function Header() {
     if (pathname === '/new-chat') pageTitle = "New Chat";
     if (pathname === '/create-group') pageTitle = "Create Group";
     if (pathname === '/reminders') pageTitle = "Reminders";
+    if (pathname === '/profile') pageTitle = "Profile";
     
     return <h1 className={cn("text-2xl font-bold", isChatDetailPage ? 'text-header-pink-neon-foreground' : 'text-foreground')}>{pageTitle}</h1>;
   };
@@ -63,7 +67,8 @@ export default function Header() {
     isChatDetailPage ||
     pathname === "/new-chat" ||
     pathname === "/create-group" ||
-    pathname === "/reminders"
+    pathname === "/reminders" ||
+    pathname === "/profile"
   );
   
   const AgentSettingsMenu = () => (
@@ -77,6 +82,12 @@ export default function Header() {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Agent Settings</DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href={`/profile?name=${encodeURIComponent(agentName || '')}&avatar=${encodeURIComponent(agentAvatar || '')}&phone=${encodeURIComponent(agentPhone || '')}`}>
+            <User className="mr-2 h-4 w-4" />
+            <span>View Profile</span>
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem>
           <Bot className="mr-2 h-4 w-4" />
           <span>Agent Mode</span>
