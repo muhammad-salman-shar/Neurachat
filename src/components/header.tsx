@@ -14,15 +14,13 @@ export default function Header() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [animate, setAnimate] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  const isSettingsPage = pathname === "/settings";
   const isChatDetailPage = pathname === "/chat-detail";
   const isChatsPage = pathname === "/chats";
-  const isRemindersPage = pathname === "/reminders";
-  const isCreateGroupPage = pathname === "/create-group";
-  const isNewChatPage = pathname === "/new-chat";
-
+  
   useEffect(() => {
+    setMounted(true);
     if (isChatsPage) {
       const animationShown = sessionStorage.getItem('neuraSaMuAnimationShown');
       if (!animationShown) {
@@ -60,8 +58,14 @@ export default function Header() {
     return <h1 className={cn("text-2xl font-bold", isChatDetailPage ? 'text-header-pink-neon-foreground' : 'text-foreground')}>{pageTitle}</h1>;
   };
 
-  const showBackButton = isSettingsPage || isChatDetailPage || isNewChatPage || isCreateGroupPage || isRemindersPage;
-
+  const showBackButton = mounted && (
+    pathname === "/settings" ||
+    isChatDetailPage ||
+    pathname === "/new-chat" ||
+    pathname === "/create-group" ||
+    pathname === "/reminders"
+  );
+  
   const AgentSettingsMenu = () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -128,7 +132,7 @@ export default function Header() {
         {isChatDetailPage ? (
            <AgentSettingsMenu />
         ) : (
-          <div className="w-9 h-9" /> // Placeholder to keep title centered
+           <div /> // Placeholder to keep title centered
         )}
       </div>
     </header>
