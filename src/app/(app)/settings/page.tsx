@@ -5,7 +5,7 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
-import { User, DatabaseZap, ShieldCheck, Wand, Info, BellRing, CalendarIcon, Mic, MessageSquare, Video, LogIn, Mail, KeyRound, Phone, UserPlus, ArrowLeft } from "lucide-react"
+import { User, DatabaseZap, ShieldCheck, Info, BellRing, CalendarIcon, Mic, Video, LogIn, Mail, KeyRound, Phone, UserPlus, ArrowLeft, Camera, FolderOpen, Lock } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -14,10 +14,11 @@ import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
 
 const settingsOptions = [
-    { id: "account", icon: User, title: "Account", description: "Profile pic, name, status", action: "button", actionText: "Edit Profile" },
-    { id: "login-signup", icon: LogIn, title: "Login & Sign Up", description: "Create an account or sign in", action: "dialog" },
+    { id: "account", icon: User, title: "Account", description: "Profile pic, name, status", action: "dialog", dialog: "editProfile" },
+    { id: "login-signup", icon: LogIn, title: "Login & Sign Up", description: "Create an account or sign in", action: "dialog", dialog: "login" },
+    { id: "permissions", icon: Lock, title: "Permissions", description: "Manage app permissions", action: "dialog", dialog: "permissions" },
     { id: "cloud-sync", icon: DatabaseZap, title: "Memory & Cloud", description: "Storage use, clean/delete option", action: "switch" },
-    { id: "privacy", icon: ShieldCheck, title: "Privacy", description: "Data encryption, manual delete", action: "button", actionText: "View Options" },
+    { id: "privacy", icon: ShieldCheck, title: "Privacy", description: "Data encryption, manual delete", action: "dialog", dialog: "privacy" },
     { id: "smart-notifications", icon: BellRing, title: "Smart Notifications", description: "Enable or disable smart notifications", action: "switch" },
     { id: "reminders", icon: CalendarIcon, title: "Reminders", description: "View and manage your reminders", href: "/reminders", action: "link" },
     { id: "about", icon: Info, title: "About", description: "Version 1.0.0, check for updates", action: "none" },
@@ -104,7 +105,7 @@ function PrivacySettingsDialog() {
             <div className="space-y-4 py-4">
                 <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                     <div className="flex items-center gap-3">
-                       <MessageSquare className="h-5 w-5 text-muted-foreground" />
+                       <Mail className="h-5 w-5 text-muted-foreground" />
                        <Label htmlFor="text-training" className="font-semibold cursor-pointer">Model Text Training</Label>
                     </div>
                     <Switch id="text-training" checked={textTraining} onCheckedChange={setTextTraining} />
@@ -245,6 +246,124 @@ function LoginSignupDialog() {
     );
 }
 
+function PermissionsDialog() {
+    const { toast } = useToast();
+    const [permissions, setPermissions] = useState({
+        microphone: false,
+        camera: false,
+        storage: false,
+    });
+    const [storagePath, setStoragePath] = useState<string | null>(null);
+
+    const handlePermissionChange = (permission: keyof typeof permissions) => {
+        setPermissions(prev => ({ ...prev, [permission]: !prev[permission] }));
+    };
+
+    const handleSelectStoragePath = async () => {
+        if ('showDirectoryPicker' in window) {
+            try {
+                const handle = await (window as any).showDirectoryPicker();
+                // For demonstration, we'll just log the handle.
+                // In a real app, you would store this handle in IndexedDB to persist access.
+                console.log(handle);
+                setStoragePath(handle.name);
+                toast({
+                    title: "Storage Path Selected",
+                    description: `Selected folder: ${handle.name}`,
+                });
+            } catch (error) {
+                console.error("Error selecting directory:", error);
+                toast({
+                    variant: "destructive",
+                    title: "Permission Denied",
+                    description: "Could not access the selected directory.",
+                });
+            }
+        } else {
+            alert("Your browser does not support the File System Access API.");
+        }
+    };
+    
+    return (
+        <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+                <DialogTitle>App Permissions</DialogTitle>
+                <DialogDescription>
+                    Manage permissions for different app features.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                    <div className="flex items-center gap-3">
+                       <Mic className="h-5 w-5 text-muted-foreground" />
+                       <Label htmlFor="mic-permission" className="font-semibold cursor-pointer">Microphone Access</Label>
+                    </div>
+                    <Switch id="mic-permission" checked={permissions.microphone} onCheckedChange={() => handlePermissionChange('microphone')} />
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                   <div className="flex items-center gap-3">
+                       <Camera className="h-5 w-5 text-muted-foreground" />
+                       <Label htmlFor="camera-permission" className="font-semibold cursor-pointer">Camera Access</Label>
+                    </div>
+                    <Switch id="camera-permission" checked={permissions.camera} onCheckedChange={() => handlePermissionChange('camera')} />
+                </div>
+                 <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                    <div className="flex items-center gap-3">
+                        <FolderOpen className="h-5 w-5 text-muted-foreground" />
+                        <Label htmlFor="storage-permission" className="font-semibold cursor-pointer">Media & Storage</Label>
+                    </div>
+                    <Switch id="storage-permission" checked={permissions.storage} onCheckedChange={() => handlePermissionChange('storage')} />
+                </div>
+                {permissions.storage && (
+                    <div className="pl-4 pt-2">
+                        <Button variant="outline" onClick={handleSelectStoragePath}>
+                            <FolderOpen className="mr-2 h-4 w-4" />
+                            Change Storage Path
+                        </Button>
+                        {storagePath && <p className="text-sm text-muted-foreground mt-2">Current path: {storagePath}</p>}
+                    </div>
+                )}
+            </div>
+             <DialogFooter>
+                <DialogClose asChild>
+                    <Button>Done</Button>
+                </DialogClose>
+            </DialogFooter>
+        </DialogContent>
+    )
+}
+
+function DialogManager({ option }: { option: (typeof settingsOptions)[number] }) {
+    if (option.action !== 'dialog' || !option.dialog) return null;
+
+    let content = null;
+    switch(option.dialog) {
+        case 'editProfile':
+            content = <EditProfileDialog />;
+            break;
+        case 'privacy':
+            content = <PrivacySettingsDialog />;
+            break;
+        case 'login':
+            content = <LoginSignupDialog />;
+            break;
+        case 'permissions':
+            content = <PermissionsDialog />;
+            break;
+    }
+
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button variant="outline">
+                    {option.id === 'account' ? 'Edit Profile' : 'Manage'}
+                </Button>
+            </DialogTrigger>
+            {content}
+        </Dialog>
+    )
+}
+
 
 export default function SettingsPage() {
     return (
@@ -266,29 +385,8 @@ export default function SettingsPage() {
                                 </div>
                             </div>
                             <div>
-                                {option.id === 'account' ? (
-                                    <Dialog>
-                                        <DialogTrigger asChild>
-                                            <Button variant="outline">{option.actionText}</Button>
-                                        </DialogTrigger>
-                                        <EditProfileDialog />
-                                    </Dialog>
-                                ) : option.id === 'privacy' ? (
-                                    <Dialog>
-                                        <DialogTrigger asChild>
-                                            <Button variant="outline">{option.actionText}</Button>
-                                        </DialogTrigger>
-                                        <PrivacySettingsDialog />
-                                    </Dialog>
-                                ) : option.id === 'login-signup' ? (
-                                     <Dialog>
-                                        <DialogTrigger asChild>
-                                            <Button variant="outline">Manage</Button>
-                                        </DialogTrigger>
-                                        <LoginSignupDialog />
-                                    </Dialog>
-                                ) : option.action === 'button' ? (
-                                    <Button variant="outline">{option.actionText}</Button>
+                                {option.action === 'dialog' ? (
+                                    <DialogManager option={option} />
                                 ) : option.action === 'switch' ? (
                                     <Switch id={option.id} defaultChecked={option.id === 'smart-notifications' || option.id === 'cloud-sync'} />
                                 ) : null}
