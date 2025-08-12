@@ -28,6 +28,7 @@ function ChatContent() {
   const agentName = searchParams.get('agent') || 'AI Companion';
   const agentEmoji = searchParams.get('emoji') || '🤖';
   const agentAvatar = searchParams.get('avatar') || 'https://placehold.co/100x100.png';
+  const contactPhone = searchParams.get('phone');
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -36,6 +37,14 @@ function ChatContent() {
 
   const handleSendMessage = () => {
     if (inputValue.trim() === '') return;
+    
+    // If it's a real contact with a phone number, use the SMS URI scheme
+    if (contactPhone && contactPhone !== 'undefined' && agentEmoji === '👤') {
+      const smsUri = `sms:${contactPhone}?body=${encodeURIComponent(inputValue)}`;
+      window.location.href = smsUri;
+      setInputValue('');
+      return;
+    }
 
     const newMessage: Message = {
       id: Date.now().toString(),
@@ -145,8 +154,8 @@ function ChatContent() {
                         <DropdownMenuTrigger asChild>
                            <div
                             className={cn(
-                              "rounded-xl px-4 py-2.5 shadow-sm cursor-pointer relative text-foreground",
-                              message.sender === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted',
+                              "rounded-2xl px-4 py-2.5 shadow-sm cursor-pointer relative text-card-foreground",
+                              message.sender === 'user' ? 'bg-primary text-primary-foreground' : 'bg-card',
                               { 'p-2': message.image && !message.text },
                               isSelected && "ring-2 ring-primary"
                             )}

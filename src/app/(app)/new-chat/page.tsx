@@ -26,6 +26,7 @@ const agents = [
 
 type PhoneContact = {
     name?: string[];
+    tel?: string[];
     icon?: string[];
 };
 
@@ -52,7 +53,7 @@ export default function NewChatPage() {
         }
 
         try {
-            const contacts = await (navigator as any).contacts.select(['name', 'icon'], { multiple: true });
+            const contacts = await (navigator as any).contacts.select(['name', 'icon', 'tel'], { multiple: true });
             if (contacts.length > 0) {
                 setPhoneContacts(contacts);
             }
@@ -63,6 +64,7 @@ export default function NewChatPage() {
 
     const handleContactClick = (contact: PhoneContact) => {
         const contactName = contact.name ? contact.name[0] : `Contact`;
+        const contactPhone = contact.tel ? contact.tel[0] : '';
         
         const existingChats = JSON.parse(localStorage.getItem("chats") || "[]");
         const isAlreadyAdded = existingChats.some((chat: any) => chat.name === contactName);
@@ -76,11 +78,12 @@ export default function NewChatPage() {
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 emoji: "👤",
                 unread: true,
+                phone: contactPhone,
             };
             localStorage.setItem("chats", JSON.stringify([...existingChats, newChat]));
         }
         
-        router.push(`/chat-detail?agent=${encodeURIComponent(contactName)}&emoji=${encodeURIComponent('👤')}`);
+        router.push(`/chat-detail?agent=${encodeURIComponent(contactName)}&emoji=${encodeURIComponent('👤')}&phone=${encodeURIComponent(contactPhone)}`);
     };
 
     const isSyncDisabled = !isContactsApiSupported || isRunningInIframe;
