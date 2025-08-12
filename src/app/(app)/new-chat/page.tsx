@@ -24,13 +24,13 @@ const agents = [
     { name: "Business Mentor", avatar: "https://placehold.co/100x100.png", hint: "mentor professional", emoji: "📈" },
 ];
 
-type Contact = {
+type PhoneContact = {
     name?: string[];
     icon?: string[];
 };
 
 export default function NewChatPage() {
-    const [phoneContacts, setPhoneContacts] = useState<Contact[]>([]);
+    const [phoneContacts, setPhoneContacts] = useState<PhoneContact[]>([]);
     const [isContactsApiSupported, setIsContactsApiSupported] = useState(false);
     const [isRunningInIframe, setIsRunningInIframe] = useState(false);
     const router = useRouter();
@@ -61,7 +61,7 @@ export default function NewChatPage() {
         }
     };
 
-    const handleContactClick = (contact: Contact) => {
+    const handleContactClick = (contact: PhoneContact) => {
         const contactName = contact.name ? contact.name[0] : `Contact`;
         
         const existingChats = JSON.parse(localStorage.getItem("chats") || "[]");
