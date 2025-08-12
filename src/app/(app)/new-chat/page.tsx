@@ -66,21 +66,25 @@ export default function NewChatPage() {
         const contactName = contact.name ? contact.name[0] : `Contact`;
         const contactPhone = contact.tel ? contact.tel[0] : '';
         
-        const existingChats = JSON.parse(localStorage.getItem("chats") || "[]");
-        const isAlreadyAdded = existingChats.some((chat: any) => chat.name === contactName);
-
-        if (!isAlreadyAdded) {
-             const newChat = {
-                name: contactName,
-                avatar: contact.icon && contact.icon.length > 0 ? contact.icon[0] : "https://placehold.co/100x100.png",
-                hint: "person face",
-                message: `You are now connected with ${contactName}`,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                emoji: "👤",
-                unread: true,
-                phone: contactPhone,
-            };
-            localStorage.setItem("chats", JSON.stringify([...existingChats, newChat]));
+        try {
+            const existingChats = JSON.parse(localStorage.getItem("chats") || "[]");
+            const isAlreadyAdded = existingChats.some((chat: any) => chat.name === contactName);
+    
+            if (!isAlreadyAdded) {
+                 const newChat = {
+                    name: contactName,
+                    avatar: contact.icon && contact.icon.length > 0 ? contact.icon[0] : "https://placehold.co/100x100.png",
+                    hint: "person face",
+                    message: `You are now connected with ${contactName}`,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    emoji: "👤",
+                    unread: false,
+                    phone: contactPhone,
+                };
+                localStorage.setItem("chats", JSON.stringify([...existingChats, newChat]));
+            }
+        } catch (error) {
+            console.error("Failed to update chats in localStorage", error);
         }
         
         router.push(`/chat-detail?agent=${encodeURIComponent(contactName)}&emoji=${encodeURIComponent('👤')}&phone=${encodeURIComponent(contactPhone)}`);

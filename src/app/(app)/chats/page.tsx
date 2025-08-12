@@ -40,19 +40,26 @@ export default function ChatsPage() {
         try {
             const storedChatsItem = localStorage.getItem("chats");
             if (storedChatsItem) {
-                const storedChats = JSON.parse(storedChatsItem);
+                const storedChats: Chat[] = JSON.parse(storedChatsItem);
                 
-                const newChats = storedChats.filter((newChat: Chat) => 
-                    !initialChats.some(existingChat => existingChat.name === newChat.name) &&
-                    !chats.some(existingChat => existingChat.name === newChat.name)
-                );
+                // Use a Map to ensure uniqueness by contact name
+                const chatMap = new Map<string, Chat>();
+                
+                // Add initial chats first
+                initialChats.forEach(chat => chatMap.set(chat.name, chat));
 
-                if (newChats.length > 0) {
-                     setChats(prevChats => [...prevChats, ...newChats]);
-                }
+                // Add stored chats, overwriting initial ones if names match, and adding new ones
+                storedChats.forEach(chat => chatMap.set(chat.name, chat));
+
+                // Convert map back to array
+                const mergedChats = Array.from(chatMap.values());
+
+                setChats(mergedChats);
             }
         } catch (error) {
             console.error("Failed to parse chats from localStorage", error);
+            // If parsing fails, just use the initial chats
+            setChats(initialChats);
         }
     }, []);
 
@@ -79,7 +86,6 @@ export default function ChatsPage() {
         const updatedChats = chats.filter(chat => !selectedChats.has(chat.name));
         setChats(updatedChats);
 
-        // Also update localStorage if needed
         try {
             const storedChats = JSON.parse(localStorage.getItem("chats") || "[]");
             const updatedStoredChats = storedChats.filter((chat: Chat) => !selectedChats.has(chat.name));
