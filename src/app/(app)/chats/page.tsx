@@ -5,19 +5,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2, Archive, Check, X, Search } from "lucide-react";
+import { Plus, Trash2, Archive, Check, X, Search, MessageSquarePlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 
 
-const initialChats = [
-    { name: "Friend", message: "Of course bro, looking awesome!", avatar: "https://placehold.co/100x100.png", hint: "cool emoji", unread: true, emoji: "😁", phone: "123-456-7890" },
-    { name: "Teacher", message: "Next quiz aa raha hai, kal revise kiya?", avatar: "https://placehold.co/100x100.png", hint: "teacher woman", time: "4:20 PM", emoji: "📝", phone: "123-456-7890" },
-    { name: "Boss", message: "Project abhi tak complete hua?", avatar: "https://placehold.co/100x100.png", hint: "business man", time: "11:15 AM", emoji: "💼", phone: "123-456-7890" },
-    { name: "Gym", message: "Aur 10 push-ups kar! 💪", avatar: "https://placehold.co/100x100.png", hint: "fit person", time: "Yesterday", emoji: "💪", phone: "123-456-7890" },
-    { name: "Girlfriend", message: "How was your day?", avatar: "https://placehold.co/100x100.png", hint: "happy woman", time: "Yesterday", emoji: "🥰", phone: "123-456-7890" },
-];
+const initialChats: Chat[] = [];
 
 type Chat = {
     name: string;
@@ -139,6 +133,24 @@ export default function ChatsPage() {
             </div>
         </div>
     );
+    
+    if (chats.length === 0 && !searchQuery) {
+        return (
+            <div className="flex flex-col items-center justify-center h-[calc(100vh-12rem)] text-center text-muted-foreground p-4">
+                <MessageSquarePlus className="h-16 w-16 mb-4 text-primary" />
+                <h2 className="text-2xl font-bold text-foreground mb-2">Welcome to NeuraSaMu!</h2>
+                <p className="mb-1">Your journey to smarter communication starts here.</p>
+                <p>Tap the button below to add your first AI Agent or contact.</p>
+                 <Button asChild className="mt-6">
+                    <Link href="/new-chat">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add New Chat
+                    </Link>
+                </Button>
+            </div>
+        )
+    }
+
 
     return (
         <div className="relative h-full">
