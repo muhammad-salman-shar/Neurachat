@@ -5,9 +5,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2, Archive, Check, X } from "lucide-react";
+import { Plus, Trash2, Archive, Check, X, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 
 
 const initialChats = [
@@ -33,6 +34,7 @@ type Chat = {
 export default function ChatsPage() {
     const [chats, setChats] = useState<Chat[]>(initialChats);
     const [selectedChats, setSelectedChats] = useState<Set<string>>(new Set());
+    const [searchQuery, setSearchQuery] = useState("");
 
     const inSelectionMode = selectedChats.size > 0;
 
@@ -114,6 +116,10 @@ export default function ChatsPage() {
         setSelectedChats(new Set());
     };
 
+    const filteredChats = chats.filter(chat =>
+        chat.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     const SelectionHeader = () => (
          <div className="flex items-center justify-between p-2 bg-card mb-2 rounded-xl sticky top-16 z-10 shadow">
             <Button variant="ghost" size="icon" onClick={() => setSelectedChats(new Set())}>
@@ -136,9 +142,20 @@ export default function ChatsPage() {
 
     return (
         <div className="relative h-full">
+            {!inSelectionMode && (
+                 <div className="relative mb-4">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Input 
+                        placeholder="Search chats..." 
+                        className="pl-10"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+            )}
             {inSelectionMode && <SelectionHeader />}
             <div className={cn("space-y-2", inSelectionMode && "pt-2")}>
-                {chats.map((chat, index) => {
+                {filteredChats.map((chat, index) => {
                     const isSelected = selectedChats.has(chat.name);
                     return (
                         <div

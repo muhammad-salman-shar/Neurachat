@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Settings, ChevronLeft, Bot, Palette, Trash2, ShieldAlert, User } from "lucide-react";
+import { Settings, ChevronLeft, Bot, Palette, Trash2, ShieldAlert, User, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -58,6 +58,7 @@ export default function Header() {
     if (pathname === '/create-group') pageTitle = "Create Group";
     if (pathname === '/reminders') pageTitle = "Reminders";
     if (pathname === '/profile') pageTitle = "Profile";
+    if (pathname === '/call-history') pageTitle = "Call History";
     
     return <h1 className={cn("text-2xl font-bold", isChatDetailPage ? 'text-header-pink-neon-foreground' : 'text-foreground')}>{pageTitle}</h1>;
   };
