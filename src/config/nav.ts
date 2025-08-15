@@ -1,4 +1,4 @@
-import { MessageSquare, Library, Archive, Settings, type LucideIcon } from "lucide-react";
+import { MessageSquare, Phone, Archive, Settings, type LucideIcon } from "lucide-react";
 
 type NavItem = {
   href: string;
@@ -15,10 +15,10 @@ export const NAV_ITEMS: NavItem[] = [
     tooltip: "All conversations",
   },
   {
-    href: "/library",
-    label: "Library",
-    icon: Library,
-    tooltip: "Your saved media",
+    href: "/call-history",
+    label: "Calls",
+    icon: Phone,
+    tooltip: "Call history",
   },
   {
     href: "/archive",
