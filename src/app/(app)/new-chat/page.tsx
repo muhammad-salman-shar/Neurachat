@@ -65,29 +65,9 @@ export default function NewChatPage() {
     const handleContactClick = (contact: PhoneContact) => {
         const contactName = contact.name ? contact.name[0] : `Contact`;
         const contactPhone = contact.tel ? contact.tel[0] : '';
+        const contactAvatar = contact.icon && contact.icon.length > 0 ? contact.icon[0] : "https://placehold.co/100x100.png"
         
-        try {
-            const existingChats = JSON.parse(localStorage.getItem("chats") || "[]");
-            const isAlreadyAdded = existingChats.some((chat: any) => chat.name === contactName);
-    
-            if (!isAlreadyAdded) {
-                 const newChat = {
-                    name: contactName,
-                    avatar: contact.icon && contact.icon.length > 0 ? contact.icon[0] : "https://placehold.co/100x100.png",
-                    hint: "person face",
-                    message: `You are now connected with ${contactName}`,
-                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    emoji: "👤",
-                    unread: false,
-                    phone: contactPhone,
-                };
-                localStorage.setItem("chats", JSON.stringify([...existingChats, newChat]));
-            }
-        } catch (error) {
-            console.error("Failed to update chats in localStorage", error);
-        }
-        
-        router.push(`/chat-detail?agent=${encodeURIComponent(contactName)}&emoji=${encodeURIComponent('👤')}&phone=${encodeURIComponent(contactPhone)}`);
+        router.push(`/chat-detail?agent=${encodeURIComponent(contactName)}&emoji=${encodeURIComponent('👤')}&avatar=${encodeURIComponent(contactAvatar)}&phone=${encodeURIComponent(contactPhone)}&isNew=true`);
     };
 
     const isSyncDisabled = !isContactsApiSupported || isRunningInIframe;
@@ -124,7 +104,7 @@ export default function NewChatPage() {
                 <h2 className="text-lg font-semibold mb-2 px-2">Agents</h2>
                 <div className="space-y-1">
                     {agents.map((agent) => (
-                        <Link href={`/chat-detail?agent=${encodeURIComponent(agent.name)}&emoji=${encodeURIComponent(agent.emoji)}`} key={agent.name} className="block hover:no-underline">
+                        <Link href={`/chat-detail?agent=${encodeURIComponent(agent.name)}&emoji=${encodeURIComponent(agent.emoji)}&avatar=${encodeURIComponent(agent.avatar)}&isNew=true`} key={agent.name} className="block hover:no-underline">
                            <div className="flex items-center gap-4 p-3 rounded-2xl hover:bg-card transition-colors cursor-pointer">
                                 <Avatar className="h-12 w-12">
                                     <AvatarImage src={agent.avatar} data-ai-hint={agent.hint} />

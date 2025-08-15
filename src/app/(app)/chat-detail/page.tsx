@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { SendHorizontal, Phone, Bot, Video, Mic, Paperclip, Trash, Copy, CheckSquare, X } from "lucide-react";
 import Image from "next/image";
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Suspense, useState, useRef, ChangeEvent } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
@@ -25,10 +25,13 @@ type Message = {
 
 function ChatContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+
   const agentName = searchParams.get('agent') || 'AI Companion';
   const agentEmoji = searchParams.get('emoji') || '🤖';
   const agentAvatar = searchParams.get('avatar') || 'https://placehold.co/100x100.png';
   const contactPhone = searchParams.get('phone');
+  const isNewChat = searchParams.get('isNew') === 'true';
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -45,6 +48,32 @@ function ChatContent() {
       setInputValue('');
       return;
     }
+
+    if (isNewChat && messages.length === 0) {
+       try {
+            const existingChats = JSON.parse(localStorage.getItem("chats") || "[]");
+            const isAlreadyAdded = existingChats.some((chat: any) => chat.name === agentName);
+    
+            if (!isAlreadyAdded) {
+                 const newChat = {
+                    name: agentName,
+                    avatar: agentAvatar,
+                    hint: "person face",
+                    message: inputValue,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    emoji: agentEmoji,
+                    unread: true,
+                    phone: contactPhone,
+                };
+                localStorage.setItem("chats", JSON.stringify([...existingChats, newChat]));
+            }
+        } catch (error) {
+            console.error("Failed to update chats in localStorage", error);
+        }
+        router.push('/chats');
+        return;
+    }
+
 
     const newMessage: Message = {
       id: Date.now().toString(),
