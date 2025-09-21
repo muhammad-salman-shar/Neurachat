@@ -5,8 +5,10 @@ import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Phone, Video, ArrowUpRight, ArrowDownLeft, Trash2, X, Check } from "lucide-react";
+import { Phone, Video, ArrowUpRight, ArrowDownLeft, Trash2, X, Check, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 const initialCallHistory = [
     { name: "Friend Agent", avatar: "https://placehold.co/100x100.png", type: "outgoing", status: "Outgoing", time: "5 minutes ago", duration: "2m 15s", phone: "+11234567890" },
@@ -15,6 +17,8 @@ const initialCallHistory = [
     { name: "Girlfriend Agent", avatar: "https://placehold.co/100x100.png", type: "outgoing", status: "Outgoing", time: "Yesterday", duration: "30m 05s", phone: "+14567890123" },
     { name: "Gym Coach", avatar: "https://placehold.co/100x100.png", type: "incoming", status: "Incoming", time: "2 days ago", duration: "5m 45s", phone: "+15678901234" },
 ];
+
+type CallType = "all" | "incoming" | "outgoing" | "missed";
 
 const CallStatusIcon = ({ type }: { type: string }) => {
     switch (type) {
@@ -32,6 +36,8 @@ const CallStatusIcon = ({ type }: { type: string }) => {
 export default function CallHistoryPage() {
     const [calls, setCalls] = useState(initialCallHistory);
     const [selectedCalls, setSelectedCalls] = useState<Set<number>>(new Set());
+    const [searchQuery, setSearchQuery] = useState("");
+    const [filter, setFilter] = useState<CallType>("all");
     
     const inSelectionMode = selectedCalls.size > 0;
 
@@ -52,7 +58,6 @@ export default function CallHistoryPage() {
             e.preventDefault();
             toggleSelection(index);
         } else {
-            // Placeholder for future click action, e.g., view call details
             console.log("Viewing call details for index:", index);
         }
     };
@@ -73,6 +78,11 @@ export default function CallHistoryPage() {
         }
     };
 
+    const filteredCalls = calls
+        .map((call, index) => ({ ...call, originalIndex: index })) // Keep original index
+        .filter(call => call.name.toLowerCase().includes(searchQuery.toLowerCase()))
+        .filter(call => filter === 'all' || call.type === filter);
+
     const SelectionHeader = () => (
         <div className="flex items-center justify-between p-2 bg-card mb-2 rounded-xl sticky top-0 z-10 shadow-sm border">
             <Button variant="ghost" size="icon" onClick={() => setSelectedCalls(new Set())}>
@@ -83,9 +93,23 @@ export default function CallHistoryPage() {
                 <Button variant="ghost" size="icon" onClick={handleDeleteSelected} title="Delete Selected">
                     <Trash2 className="h-5 w-5 text-destructive" />
                 </Button>
-                 <Button variant="ghost" onClick={handleClearAll} className="text-destructive">
-                    Clear All
-                </Button>
+                 <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button variant="ghost" className="text-destructive">Clear All</Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This will permanently delete your entire call history. This action cannot be undone.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleClearAll}>Delete</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             </div>
         </div>
     );
@@ -97,15 +121,41 @@ export default function CallHistoryPage() {
                 <CardDescription>Review your recent voice and video calls.</CardDescription>
             </CardHeader>
             <CardContent>
-                {inSelectionMode && <SelectionHeader />}
+                {inSelectionMode ? (
+                    <SelectionHeader />
+                ) : (
+                    <div className="space-y-4 mb-4">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input
+                                placeholder="Search by name..."
+                                className="pl-10"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex gap-2">
+                            {(['all', 'incoming', 'outgoing', 'missed'] as CallType[]).map(f => (
+                                <Button 
+                                    key={f}
+                                    variant={filter === f ? "default" : "outline"}
+                                    onClick={() => setFilter(f)}
+                                    className="capitalize"
+                                >
+                                    {f}
+                                </Button>
+                            ))}
+                        </div>
+                    </div>
+                )}
                 <div className="space-y-2">
-                    {calls.map((call, index) => {
-                         const isSelected = selectedCalls.has(index);
+                    {filteredCalls.map((call) => {
+                         const isSelected = selectedCalls.has(call.originalIndex);
                          return (
                             <div 
-                                key={index} 
-                                onClick={(e) => handleCallClick(e, index)}
-                                onContextMenu={(e) => { e.preventDefault(); toggleSelection(index); }}
+                                key={call.originalIndex} 
+                                onClick={(e) => handleCallClick(e, call.originalIndex)}
+                                onContextMenu={(e) => { e.preventDefault(); toggleSelection(call.originalIndex); }}
                                 className={cn(
                                     "flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer relative",
                                     isSelected && "bg-primary/10"
@@ -139,6 +189,11 @@ export default function CallHistoryPage() {
                             </div>
                         )
                     })}
+                    {calls.length > 0 && filteredCalls.length === 0 && (
+                        <div className="text-center py-12 text-muted-foreground">
+                            <p>No calls match your search or filter.</p>
+                        </div>
+                    )}
                     {calls.length === 0 && (
                         <div className="text-center py-12 text-muted-foreground">
                             <p>Your call history is empty.</p>
