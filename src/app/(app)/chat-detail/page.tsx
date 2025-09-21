@@ -163,9 +163,8 @@ function ChatContent() {
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
               <span className="text-6xl mb-4">{agentEmoji}</span>
-              <h2 className="text-2xl font-bold text-foreground">Welcome!</h2>
-              <p className="text-lg">I am your {agentName}.</p>
-              <p>Send a message to start our conversation.</p>
+              <h2 className="text-2xl font-bold text-foreground">Start chatting with {agentName}</h2>
+              <p>Send a message to begin your conversation.</p>
             </div>
           ) : (
             <div className="space-y-6">
