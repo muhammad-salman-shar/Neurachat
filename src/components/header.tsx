@@ -52,7 +52,7 @@ export default function Header() {
     }
 
     let pageTitle = "NeuraChat";
-    if (pathname === '/library') pageTitle = "Library";
+    if (pathname === '/agents') pageTitle = "Agents";
     if (pathname === '/archive') pageTitle = "Archive";
     if (pathname === '/settings') pageTitle = "Settings";
     if (pathname === '/new-chat') pageTitle = "New Chat";
@@ -67,7 +67,6 @@ export default function Header() {
   const showBackButton = mounted && (
     pathname === "/settings" ||
     isChatDetailPage ||
-    pathname === "/new-chat" ||
     pathname === "/create-group" ||
     pathname === "/reminders" ||
     pathname === "/profile"

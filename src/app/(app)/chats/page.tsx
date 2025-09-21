@@ -9,11 +9,12 @@ import { Plus, Trash2, Archive, Check, X, Search, MessageSquarePlus } from "luci
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import NewChatDialog from "@/components/new-chat-dialog";
 
 
 const initialChats: Chat[] = [];
 
-type Chat = {
+export type Chat = {
     name: string;
     message: string;
     avatar: string;
@@ -30,37 +31,37 @@ export default function ChatsPage() {
     const [selectedChats, setSelectedChats] = useState<Set<string>>(new Set());
     const [searchQuery, setSearchQuery] = useState("");
     const [isLoading, setIsLoading] = useState(true);
+    const [isNewChatOpen, setIsNewChatOpen] = useState(false);
 
 
     const inSelectionMode = selectedChats.size > 0;
-
-    useEffect(() => {
+    
+    const loadChats = () => {
         try {
             const storedChatsItem = localStorage.getItem("chats");
             if (storedChatsItem) {
                 const storedChats: Chat[] = JSON.parse(storedChatsItem);
                 
-                // Use a Map to ensure uniqueness by contact name
                 const chatMap = new Map<string, Chat>();
                 
-                // Add initial chats first
                 initialChats.forEach(chat => chatMap.set(chat.name, chat));
-
-                // Add stored chats, overwriting initial ones if names match, and adding new ones
                 storedChats.forEach(chat => chatMap.set(chat.name, chat));
 
-                // Convert map back to array
                 const mergedChats = Array.from(chatMap.values());
-
                 setChats(mergedChats);
+            } else {
+                 setChats(initialChats);
             }
         } catch (error) {
             console.error("Failed to parse chats from localStorage", error);
-            // If parsing fails, just use the initial chats
             setChats(initialChats);
         } finally {
             setIsLoading(false);
         }
+    }
+
+    useEffect(() => {
+        loadChats();
     }, []);
 
     const toggleSelection = (chatName: string) => {
@@ -98,7 +99,6 @@ export default function ChatsPage() {
     };
     
     const handleArchiveSelected = () => {
-        // Placeholder for archive logic
         alert(`${selectedChats.size} chats archived!`);
         setSelectedChats(new Set());
     };
@@ -112,6 +112,10 @@ export default function ChatsPage() {
         });
         setChats(updatedChats);
         setSelectedChats(new Set());
+    };
+
+    const handleChatsAdded = () => {
+        loadChats(); // Reload chats from localStorage
     };
 
     const filteredChats = chats.filter(chat =>
@@ -153,12 +157,12 @@ export default function ChatsPage() {
                 <h2 className="text-2xl font-bold text-foreground mb-2">Welcome to NeuraChat!</h2>
                 <p className="mb-1">Your journey to smarter communication starts here.</p>
                 <p>Tap the button below to add your first AI Agent or contact.</p>
-                 <Button asChild className="mt-6">
-                    <Link href="/new-chat">
+                <NewChatDialog onOpenChange={setIsNewChatOpen} onChatsAdded={handleChatsAdded}>
+                     <Button className="mt-6">
                         <Plus className="mr-2 h-4 w-4" />
                         Add New Chat
-                    </Link>
-                </Button>
+                    </Button>
+                </NewChatDialog>
             </div>
         )
     }
@@ -217,12 +221,12 @@ export default function ChatsPage() {
                 })}
             </div>
             {!inSelectionMode && (
-                <Button asChild className="fixed bottom-24 right-6 h-16 w-16 rounded-full shadow-lg">
-                    <Link href="/new-chat">
+                <NewChatDialog onOpenChange={setIsNewChatOpen} onChatsAdded={handleChatsAdded}>
+                    <Button className="fixed bottom-24 right-6 h-16 w-16 rounded-full shadow-lg">
                         <Plus className="h-8 w-8" />
                         <span className="sr-only">New Chat</span>
-                    </Link>
-                </Button>
+                    </Button>
+                </NewChatDialog>
             )}
         </div>
     );
