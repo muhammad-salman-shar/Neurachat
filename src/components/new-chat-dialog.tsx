@@ -3,12 +3,13 @@
 
 import { useState, useEffect, ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Contact, Bot, Check } from "lucide-react";
+import { Contact, Bot, Check, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Chat } from "@/app/(app)/chats/page";
 
@@ -116,6 +117,12 @@ export default function NewChatDialog({ children, onOpenChange, onChatsAdded }: 
                     <TabsContent value="agents" className="flex-grow overflow-hidden">
                         <ScrollArea className="h-full pr-3">
                             <div className="space-y-1 py-2">
+                                <Button asChild variant="outline" className="w-full">
+                                    <Link href="/create-group" onClick={() => setIsOpen(false)}>
+                                        <Users className="mr-2 h-4 w-4" />
+                                        Create Group
+                                    </Link>
+                                </Button>
                                 {agents.map((agent) => {
                                     const isSelected = selectedItem?.name === agent.name;
                                     return (
