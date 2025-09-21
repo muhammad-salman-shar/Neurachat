@@ -6,37 +6,38 @@ import { cn } from "@/lib/utils";
 
 export default function SplashScreen() {
   const [isMounted, setIsMounted] = useState(false);
-  const [show, setShow] = useState(true);
-  const [animationClass, setAnimationClass] = useState("animate-splash-in");
+  const [isHiding, setIsHiding] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
   useEffect(() => {
-    if (!isMounted) {
-      return;
+    if (isMounted) {
+      const splashShown = sessionStorage.getItem("splashScreenShown");
+      if (splashShown) {
+        setIsHiding(true);
+      } else {
+        const timer = setTimeout(() => {
+          setIsHiding(true);
+          sessionStorage.setItem("splashScreenShown", "true");
+        }, 200);
+        return () => clearTimeout(timer);
+      }
     }
-
-    const splashShown = sessionStorage.getItem("splashScreenShown");
-    if (splashShown) {
-      setShow(false);
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      setAnimationClass("animate-splash-out");
-      const hideTimer = setTimeout(() => {
-        setShow(false);
-        sessionStorage.setItem("splashScreenShown", "true");
-      }, 200); // match animation duration
-      return () => clearTimeout(hideTimer);
-    }, 200); // 0.2s visible, 0.2s fade out
-
-    return () => clearTimeout(timer);
   }, [isMounted]);
 
-  if (!show || !isMounted) {
+  if (!isMounted && !isHiding) {
+     return (
+       <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
+         <h1 className="text-5xl font-bold text-primary tracking-wider font-headline">
+           NeuraChat
+         </h1>
+       </div>
+     );
+  }
+  
+  if (isHiding) {
     return null;
   }
 
@@ -44,7 +45,7 @@ export default function SplashScreen() {
     <div
       className={cn(
         "fixed inset-0 z-50 flex items-center justify-center bg-background",
-        animationClass
+        isHiding ? "animate-splash-out" : "animate-splash-in"
       )}
     >
       <h1 className="text-5xl font-bold text-primary tracking-wider font-headline">
