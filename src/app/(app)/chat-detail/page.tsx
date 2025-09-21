@@ -41,7 +41,8 @@ function ChatContent() {
   const handleSendMessage = () => {
     if (inputValue.trim() === '') return;
     
-    if (contactPhone && contactPhone !== 'undefined' && agentEmoji === '👤') {
+    // Check if it's a real contact (has phone and emoji is user icon)
+    if (contactPhone && contactPhone !== 'undefined' && contactPhone !== 'null' && agentEmoji === '👤') {
       const smsUri = `sms:${contactPhone}?body=${encodeURIComponent(inputValue)}`;
       window.location.href = smsUri;
       setInputValue('');
