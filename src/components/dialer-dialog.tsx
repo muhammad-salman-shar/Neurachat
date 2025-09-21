@@ -65,10 +65,10 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
     <Dialog open={open} onOpenChange={handleDialogChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px] flex flex-col h-[70vh] p-4">
-        <DialogHeader className="sr-only">
-          <DialogTitle>Dialer</DialogTitle>
+        <DialogHeader>
+          <DialogTitle className="sr-only">Dialer</DialogTitle>
         </DialogHeader>
-        <div className="flex-grow flex flex-col justify-between">
+        <div className="flex-grow flex flex-col justify-end">
             <div className="p-4 text-center">
                 <Input
                     readOnly
@@ -76,6 +76,17 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
                     className="text-3xl font-light text-center border-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0"
                     placeholder="Enter number"
                 />
+            </div>
+             <div className="px-4 pb-4 text-center">
+                 <Button
+                    variant="secondary"
+                    className="w-full h-12"
+                    onClick={handleMessage}
+                    disabled={!number}
+                >
+                    <MessageSquare className="mr-2 h-5 w-5" />
+                    Send Message
+                </Button>
             </div>
 
             <div className="grid grid-cols-3 gap-2">
@@ -93,7 +104,7 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
 
              <div className="flex justify-around items-center p-4">
                 <Button variant="ghost" className="h-20 w-20 rounded-full invisible">
-                    {/* Placeholder */}
+                    {/* Placeholder for alignment */}
                 </Button>
                 <Button
                     variant="default"
@@ -110,18 +121,6 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
                     disabled={!number}
                 >
                     <Delete className="h-8 w-8" />
-                </Button>
-            </div>
-
-            <div className="px-4 pb-2">
-                 <Button
-                    variant="secondary"
-                    className="w-full h-14"
-                    onClick={handleMessage}
-                    disabled={!number}
-                >
-                    <MessageSquare className="mr-2 h-5 w-5" />
-                    Send Message
                 </Button>
             </div>
         </div>
