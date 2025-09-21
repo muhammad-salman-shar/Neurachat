@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -63,6 +65,9 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
     <Dialog open={open} onOpenChange={handleDialogChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px] flex flex-col h-[70vh] p-4">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Dialer</DialogTitle>
+        </DialogHeader>
         <div className="flex-grow flex flex-col justify-between">
             <div className="p-4 text-center">
                 <Input
