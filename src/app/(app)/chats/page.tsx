@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import NewChatDialog from "@/components/new-chat-dialog";
+import ChatActionsSheet from "@/components/chat-actions-sheet";
 
 
 const initialChats: Chat[] = [];
@@ -32,6 +33,8 @@ export default function ChatsPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [isNewChatOpen, setIsNewChatOpen] = useState(false);
+    const [activeChat, setActiveChat] = useState<Chat | null>(null);
+    const [isSheetOpen, setIsSheetOpen] = useState(false);
 
 
     const inSelectionMode = selectedChats.size > 0;
@@ -118,6 +121,18 @@ export default function ChatsPage() {
         loadChats(); // Reload chats from localStorage
     };
 
+    const handleAvatarClick = (e: React.MouseEvent, chat: Chat) => {
+        if (inSelectionMode) {
+            e.preventDefault();
+            toggleSelection(chat.name);
+            return;
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        setActiveChat(chat);
+        setIsSheetOpen(true);
+    };
+
     const filteredChats = chats.filter(chat =>
         chat.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -185,7 +200,6 @@ export default function ChatsPage() {
             <div className={cn("space-y-2", inSelectionMode && "pt-2")}>
                 {filteredChats.map((chat, index) => {
                     const isSelected = selectedChats.has(chat.name);
-                    const profileUrl = `/profile?name=${encodeURIComponent(chat.name)}&avatar=${encodeURIComponent(chat.avatar)}&phone=${encodeURIComponent(chat.phone || '')}&emoji=${encodeURIComponent(chat.emoji)}`;
                     const chatUrl = `/chat-detail?agent=${encodeURIComponent(chat.name)}&emoji=${encodeURIComponent(chat.emoji)}&avatar=${encodeURIComponent(chat.avatar)}&phone=${encodeURIComponent(chat.phone || '')}`;
 
                     return (
@@ -197,19 +211,12 @@ export default function ChatsPage() {
                         >
                             <div className="flex items-center gap-4 p-3 rounded-2xl hover:bg-card">
                                 <div className="relative">
-                                    <Link href={profileUrl} onClick={(e) => {
-                                        // Stop propagation to prevent the outer link from firing
-                                        if (!inSelectionMode) {
-                                            e.stopPropagation();
-                                        } else {
-                                            e.preventDefault();
-                                        }
-                                    }}>
+                                    <button onClick={(e) => handleAvatarClick(e, chat)} className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full">
                                         <Avatar className="h-14 w-14 text-2xl">
                                             <AvatarImage src={chat.avatar} data-ai-hint={chat.hint} />
                                             <AvatarFallback>{chat.emoji}</AvatarFallback>
                                         </Avatar>
-                                    </Link>
+                                    </button>
                                     {chat.unread && !isSelected && <span className="absolute bottom-0 right-0 block h-3.5 w-3.5 rounded-full bg-green-500 border-2 border-background"></span>}
                                     {isSelected && (
                                         <div className="absolute top-0 left-0 h-full w-full bg-black/50 rounded-full flex items-center justify-center pointer-events-none">
@@ -242,6 +249,13 @@ export default function ChatsPage() {
                         <span className="sr-only">New Chat</span>
                     </Button>
                 </NewChatDialog>
+            )}
+            {activeChat && (
+                <ChatActionsSheet 
+                    isOpen={isSheetOpen}
+                    onOpenChange={setIsSheetOpen}
+                    chat={activeChat}
+                />
             )}
         </div>
     );
