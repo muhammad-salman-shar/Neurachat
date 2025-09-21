@@ -404,9 +404,9 @@ function DialogManager({ option, profileImage, setProfileImage, profileName, set
 }
 
 const settingsOptions = [
-    { id: "account", icon: (props: { profileImage: string }) => (
-        <Avatar className="h-6 w-6">
-            <AvatarImage src={props.profileImage} data-ai-hint="person face" />
+    { id: "account", icon: ({ profileImage, ...props }: { profileImage: string; [key: string]: any }) => (
+        <Avatar {...props}>
+            <AvatarImage src={profileImage} data-ai-hint="person face" />
             <AvatarFallback><User className="h-4 w-4" /></AvatarFallback>
         </Avatar>
     ), title: "Account", description: "Profile pic, name, status", action: "dialog", dialog: "editProfile" },
@@ -498,5 +498,7 @@ export default function SettingsPage() {
         </Card>
     );
 }
+
+    
 
     
