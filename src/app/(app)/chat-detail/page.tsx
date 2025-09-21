@@ -41,7 +41,6 @@ function ChatContent() {
   const handleSendMessage = () => {
     if (inputValue.trim() === '') return;
     
-    // If it's a real contact with a phone number, use the SMS URI scheme
     if (contactPhone && contactPhone !== 'undefined' && agentEmoji === '👤') {
       const smsUri = `sms:${contactPhone}?body=${encodeURIComponent(inputValue)}`;
       window.location.href = smsUri;
@@ -137,7 +136,7 @@ function ChatContent() {
   }
 
   const handleMakeCall = () => {
-    if (contactPhone && contactPhone !== 'undefined') {
+    if (contactPhone && contactPhone !== 'undefined' && contactPhone !== 'null') {
       window.location.href = `tel:${contactPhone}`;
     } else {
       alert("No phone number available for this contact.");

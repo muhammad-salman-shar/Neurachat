@@ -15,6 +15,8 @@ function ProfileContent() {
     const name = searchParams.get('name') || 'Unknown User';
     const avatar = searchParams.get('avatar') || 'https://placehold.co/128x128.png';
     const phone = searchParams.get('phone') || 'No phone number';
+    const emoji = searchParams.get('emoji');
+
 
     const handleMakeCall = () => {
         if (phone && phone !== 'No phone number') {
@@ -25,7 +27,11 @@ function ProfileContent() {
     };
 
     const handleSendMessage = () => {
-        router.push(`/chat-detail?agent=${encodeURIComponent(name)}&avatar=${encodeURIComponent(avatar)}&phone=${encodeURIComponent(phone)}`);
+        if (phone && phone !== 'No phone number' && emoji !== '👤') {
+             window.location.href = `sms:${phone}`;
+        } else {
+             router.push(`/chat-detail?agent=${encodeURIComponent(name)}&avatar=${encodeURIComponent(avatar)}&phone=${encodeURIComponent(phone)}`);
+        }
     };
 
     return (

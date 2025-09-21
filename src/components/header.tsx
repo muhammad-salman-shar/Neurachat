@@ -34,6 +34,7 @@ export default function Header() {
   const agentName = searchParams.get('agent');
   const agentAvatar = searchParams.get('avatar');
   const agentPhone = searchParams.get('phone');
+  const agentEmoji = searchParams.get('emoji');
 
 
   const getTitle = () => {
@@ -84,7 +85,7 @@ export default function Header() {
         <DropdownMenuLabel>Agent Settings</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href={`/profile?name=${encodeURIComponent(agentName || '')}&avatar=${encodeURIComponent(agentAvatar || '')}&phone=${encodeURIComponent(agentPhone || '')}`}>
+          <Link href={`/profile?name=${encodeURIComponent(agentName || '')}&avatar=${encodeURIComponent(agentAvatar || '')}&phone=${encodeURIComponent(agentPhone || '')}&emoji=${encodeURIComponent(agentEmoji || '')}`}>
             <User className="mr-2 h-4 w-4" />
             <span>View Profile</span>
           </Link>
