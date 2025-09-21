@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { SendHorizontal, Phone, Bot, Video, Mic, Paperclip, Trash, Copy, CheckSquare, X } from "lucide-react";
 import Image from "next/image";
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Suspense, useState, useRef, ChangeEvent } from "react";
+import { Suspense, useState, useRef, ChangeEvent, useCallback } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 
@@ -37,12 +37,26 @@ function ChatContent() {
   const [inputValue, setInputValue] = useState('');
   const [selectedMessages, setSelectedMessages] = useState<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isOnlineMode, setIsOnlineMode] = useState(false);
+
+  const handleToggleOnlineMode = useCallback((isOnline: boolean) => {
+    setIsOnlineMode(isOnline);
+  }, []);
 
   const handleSendMessage = () => {
     if (inputValue.trim() === '') return;
     
     // Check if it's a real contact (has phone and emoji is user icon)
-    if (contactPhone && contactPhone !== 'undefined' && contactPhone !== 'null' && agentEmoji === '👤') {
+    const isRealContact = contactPhone && contactPhone !== 'undefined' && contactPhone !== 'null';
+
+    if (isRealContact && isOnlineMode) {
+        const whatsappUri = `https://wa.me/${contactPhone.replace(/\+/g, '')}?text=${encodeURIComponent(inputValue)}`;
+        window.open(whatsappUri, '_blank');
+        setInputValue('');
+        return;
+    }
+    
+    if (isRealContact && agentEmoji === '👤') {
       const smsUri = `sms:${contactPhone}?body=${encodeURIComponent(inputValue)}`;
       window.location.href = smsUri;
       setInputValue('');
@@ -136,9 +150,16 @@ function ChatContent() {
     setSelectedMessages(new Set());
   }
 
-  const handleMakeCall = () => {
-    if (contactPhone && contactPhone !== 'undefined' && contactPhone !== 'null') {
-      window.location.href = `tel:${contactPhone}`;
+  const handleMakeCall = (callType: 'voice' | 'video' = 'voice') => {
+    const isRealContact = contactPhone && contactPhone !== 'undefined' && contactPhone !== 'null';
+    if (isRealContact) {
+      if(isOnlineMode) {
+        // WhatsApp call link (voice only, video call link is not standardized)
+        const whatsappUri = `https://wa.me/${contactPhone.replace(/\+/g, '')}`;
+        window.open(whatsappUri, '_blank');
+      } else {
+        window.location.href = `tel:${contactPhone}`;
+      }
     } else {
       alert("No phone number available for this contact.");
     }
@@ -273,11 +294,11 @@ function ChatContent() {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleMakeCall}>
+                <DropdownMenuItem onClick={() => handleMakeCall('video')}>
                     <Video className="mr-2 h-4 w-4" />
                     <span>Video Call</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleMakeCall}>
+                <DropdownMenuItem onClick={() => handleMakeCall('voice')}>
                     <Mic className="mr-2 h-4 w-4" />
                     <span>Voice Call</span>
                 </DropdownMenuItem>

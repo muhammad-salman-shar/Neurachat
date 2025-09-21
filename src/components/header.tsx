@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import Link from "next/link";
@@ -8,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 export default function Header() {
   const pathname = usePathname();
@@ -15,6 +18,8 @@ export default function Header() {
   const searchParams = useSearchParams();
   const [animate, setAnimate] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isOnline, setIsOnline] = useState(false);
+
 
   const isChatDetailPage = pathname === "/chat-detail";
   const isChatsPage = pathname === "/chats";
@@ -35,7 +40,8 @@ export default function Header() {
   const agentAvatar = searchParams.get('avatar');
   const agentPhone = searchParams.get('phone');
   const agentEmoji = searchParams.get('emoji');
-
+  
+  const isRealContact = agentPhone && agentPhone !== 'undefined' && agentPhone !== 'null';
 
   const getTitle = () => {
     if (isChatDetailPage && agentName) {
@@ -81,6 +87,15 @@ export default function Header() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+         {isRealContact && (
+          <>
+            <div className="px-2 py-1.5 flex items-center space-x-2">
+              <Switch id="online-mode" checked={isOnline} onCheckedChange={setIsOnline}/>
+              <Label htmlFor="online-mode" className="text-sm font-medium cursor-pointer">Online</Label>
+            </div>
+            <DropdownMenuSeparator />
+          </>
+        )}
         <DropdownMenuLabel>Agent Settings</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
