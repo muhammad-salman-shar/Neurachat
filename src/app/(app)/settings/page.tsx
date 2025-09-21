@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, ChangeEvent } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
@@ -37,6 +37,20 @@ function EditProfileDialog() {
     const [dob, setDob] = useState<Date | undefined>(new Date("1998-01-01"));
     const [showActivity, setShowActivity] = useState(true);
     const { toast } = useToast();
+    const [profileImage, setProfileImage] = useState("https://placehold.co/100x100.png");
+    const imageInputRef = useRef<HTMLInputElement>(null);
+
+    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                if (event.target?.result) {
+                    setProfileImage(event.target.result as string);
+                }
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    };
 
     const handleSave = () => {
         toast({
@@ -56,8 +70,9 @@ function EditProfileDialog() {
             <div className="grid gap-4 py-4">
                  <div className="flex flex-col items-center gap-4">
                     <div className="relative">
-                        <img src="https://placehold.co/100x100.png" alt="Profile" className="rounded-full w-24 h-24" data-ai-hint="person face" />
-                        <Button size="icon" className="absolute bottom-0 right-0 rounded-full h-8 w-8">
+                        <input type="file" ref={imageInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
+                        <img src={profileImage} alt="Profile" className="rounded-full w-24 h-24 object-cover cursor-pointer" data-ai-hint="person face" onClick={() => imageInputRef.current?.click()} />
+                        <Button size="icon" className="absolute bottom-0 right-0 rounded-full h-8 w-8" onClick={() => imageInputRef.current?.click()}>
                             <Camera className="h-4 w-4" />
                         </Button>
                     </div>
