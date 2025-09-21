@@ -21,7 +21,7 @@ const settingsOptions = [
     { id: "privacy", icon: ShieldCheck, title: "Privacy", description: "Data encryption, manual delete", action: "dialog", dialog: "privacy" },
     { id: "smart-notifications", icon: BellRing, title: "Smart Notifications", description: "Enable or disable smart notifications", action: "switch" },
     { id: "reminders", icon: CalendarIcon, title: "Reminders", description: "View and manage your reminders", href: "/reminders", action: "link" },
-    { id: "about", icon: Info, title: "About", description: "Version 1.0.0, check for updates", action: "none" },
+    { id: "about", icon: Info, title: "About", description: "Version 68.7.526, check for updates", action: "none" },
 ];
 
 function EditProfileDialog() {
