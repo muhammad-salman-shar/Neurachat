@@ -34,6 +34,7 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
   const [number, setNumber] = useState("");
   const router = useRouter();
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const pressStartTime = useRef<number>(0);
 
   const handleKeyPress = (key: string) => {
     setNumber((prev) => prev + key);
@@ -72,6 +73,7 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
   }
 
   const handleZeroPressStart = () => {
+    pressStartTime.current = Date.now();
     longPressTimer.current = setTimeout(() => {
       setNumber(prev => prev + '+');
       longPressTimer.current = null; // Mark as long pressed
@@ -81,7 +83,10 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
   const handleZeroPressEnd = () => {
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
-      handleKeyPress('0'); // It was a short press
+      longPressTimer.current = null;
+      if (Date.now() - pressStartTime.current < 500) {
+        handleKeyPress('0'); // It was a short press
+      }
     }
   };
 
@@ -157,9 +162,7 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
             </div>
 
              <div className="flex justify-around items-center p-4">
-                <Button variant="ghost" className="h-20 w-20 rounded-full invisible">
-                    {/* Placeholder for alignment */}
-                </Button>
+                <div className="h-20 w-20" />
                 <Button
                     variant="default"
                     className="h-20 w-20 rounded-full bg-green-500 hover:bg-green-600"
