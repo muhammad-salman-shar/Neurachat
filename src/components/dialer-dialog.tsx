@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -9,13 +9,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MessageSquare, Phone, Delete, UserPlus } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-
+import { MessageSquare, Phone, Delete, UserPlus, X } from "lucide-react";
 
 type DialerDialogProps = {
   open: boolean;
@@ -34,7 +32,14 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
   const [number, setNumber] = useState("");
   const router = useRouter();
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
-  const pressStartTime = useRef<number>(0);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (open) {
+      // Focus the input when the dialog opens
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  }, [open]);
 
   const handleKeyPress = (key: string) => {
     setNumber((prev) => prev + key);
@@ -43,6 +48,10 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
   const handleBackspace = () => {
     setNumber((prev) => prev.slice(0, -1));
   };
+  
+  const handleClear = () => {
+    setNumber("");
+  }
 
   const handleCall = () => {
     if (number) {
@@ -73,96 +82,72 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
   }
 
   const handleZeroPressStart = () => {
-    pressStartTime.current = Date.now();
     longPressTimer.current = setTimeout(() => {
       setNumber(prev => prev + '+');
-      longPressTimer.current = null; // Mark as long pressed
-    }, 500); // 500ms for long press
+      longPressTimer.current = null;
+    }, 500);
   };
 
   const handleZeroPressEnd = () => {
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
-      if (Date.now() - pressStartTime.current < 500) {
-        handleKeyPress('0'); // It was a short press
-      }
+      handleKeyPress('0');
     }
   };
-
 
   return (
     <Dialog open={open} onOpenChange={handleDialogChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px] flex flex-col p-4 top-auto bottom-0 translate-x-[-50%] translate-y-0 rounded-b-none sm:rounded-b-lg data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom">
-        <DialogHeader>
-           <VisuallyHidden>
+        <DialogHeader className="text-center">
             <DialogTitle>Dialer</DialogTitle>
-          </VisuallyHidden>
         </DialogHeader>
+        <DialogClose asChild>
+          <Button variant="ghost" size="icon" className="absolute top-3 right-3">
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </Button>
+        </DialogClose>
         <div className="flex-grow flex flex-col justify-end">
             <div className="p-4 text-center">
                 <Input
-                    readOnly
+                    ref={inputRef}
                     value={number}
-                    className="text-3xl font-light text-center border-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0"
+                    onChange={(e) => setNumber(e.target.value)}
+                    className="text-3xl font-light text-center border-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent shrink-0"
                     placeholder="Enter number"
                 />
             </div>
-             <div className="px-4 pb-4 flex gap-2">
-                 <Button
-                    variant="secondary"
-                    className="flex-1 h-12"
-                    onClick={handleMessage}
-                    disabled={!number}
-                >
-                    <MessageSquare className="mr-2 h-5 w-5" />
-                    Send Message
-                </Button>
-                 <Button
-                    variant="secondary"
-                    className="flex-1 h-12"
-                    onClick={handleAddContact}
-                    disabled={!number}
-                >
-                    <UserPlus className="mr-2 h-5 w-5" />
-                    Add Contact
-                </Button>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2">
+            
+            <div className="grid grid-cols-3 gap-2 px-4">
                 {keypadButtons.map((key) => {
-                  if (key === '0') {
-                    return (
-                       <Button
-                        key={key}
-                        variant="ghost"
-                        className="h-20 text-3xl font-light rounded-full relative"
-                        onMouseDown={handleZeroPressStart}
-                        onMouseUp={handleZeroPressEnd}
-                        onTouchStart={handleZeroPressStart}
-                        onTouchEnd={handleZeroPressEnd}
-                      >
-                        0
-                        <span className="absolute bottom-5 text-xs font-semibold">+</span>
-                      </Button>
-                    )
-                  }
+                  const props = key === '0' ? {
+                    onMouseDown: handleZeroPressStart,
+                    onMouseUp: handleZeroPressEnd,
+                    onTouchStart: handleZeroPressStart,
+                    onTouchEnd: handleZeroPressEnd,
+                  } : {
+                    onClick: () => handleKeyPress(key)
+                  };
                   return (
                     <Button
-                        key={key}
-                        variant="ghost"
-                        className="h-20 text-3xl font-light rounded-full"
-                        onClick={() => handleKeyPress(key)}
+                      key={key}
+                      variant="ghost"
+                      className="h-20 text-3xl font-light rounded-full relative"
+                      {...props}
                     >
-                        {key}
+                      {key}
+                      {key === '0' && <span className="absolute bottom-5 text-xs font-semibold">+</span>}
                     </Button>
-                  )
+                  );
                 })}
             </div>
 
              <div className="flex justify-around items-center p-4">
-                <div className="h-20 w-20" />
+                <Button variant="ghost" className="h-20 w-20 rounded-full" onClick={handleMessage} disabled={!number}>
+                    <MessageSquare className="h-7 w-7" />
+                </Button>
                 <Button
                     variant="default"
                     className="h-20 w-20 rounded-full bg-green-500 hover:bg-green-600"
@@ -175,6 +160,7 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
                     variant="ghost"
                     className="h-20 w-20 rounded-full"
                     onClick={handleBackspace}
+                    onLongPress={handleClear}
                     disabled={!number}
                 >
                     <Delete className="h-8 w-8" />
