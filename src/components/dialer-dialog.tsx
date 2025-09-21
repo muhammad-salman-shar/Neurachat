@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -33,6 +33,7 @@ const keypadButtons = [
 export default function DialerDialog({ open, onOpenChange, children }: DialerDialogProps) {
   const [number, setNumber] = useState("");
   const router = useRouter();
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
 
   const handleKeyPress = (key: string) => {
     setNumber((prev) => prev + key);
@@ -69,6 +70,21 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
         setNumber("");
     }
   }
+
+  const handleZeroPressStart = () => {
+    longPressTimer.current = setTimeout(() => {
+      setNumber(prev => prev + '+');
+      longPressTimer.current = null; // Mark as long pressed
+    }, 500); // 500ms for long press
+  };
+
+  const handleZeroPressEnd = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      handleKeyPress('0'); // It was a short press
+    }
+  };
+
 
   return (
     <Dialog open={open} onOpenChange={handleDialogChange}>
@@ -110,7 +126,24 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
             </div>
 
             <div className="grid grid-cols-3 gap-2">
-                {keypadButtons.map((key) => (
+                {keypadButtons.map((key) => {
+                  if (key === '0') {
+                    return (
+                       <Button
+                        key={key}
+                        variant="ghost"
+                        className="h-20 text-3xl font-light rounded-full relative"
+                        onMouseDown={handleZeroPressStart}
+                        onMouseUp={handleZeroPressEnd}
+                        onTouchStart={handleZeroPressStart}
+                        onTouchEnd={handleZeroPressEnd}
+                      >
+                        0
+                        <span className="absolute bottom-5 text-xs font-semibold">+</span>
+                      </Button>
+                    )
+                  }
+                  return (
                     <Button
                         key={key}
                         variant="ghost"
@@ -119,7 +152,8 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
                     >
                         {key}
                     </Button>
-                ))}
+                  )
+                })}
             </div>
 
              <div className="flex justify-around items-center p-4">
