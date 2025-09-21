@@ -19,8 +19,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-function EditProfileDialog({ profileImage, setProfileImage }: { profileImage: string, setProfileImage: (image: string) => void }) {
-    const [name, setName] = useState("Sam");
+function EditProfileDialog({ profileImage, setProfileImage, profileName, setProfileName }: { profileImage: string, setProfileImage: (image: string) => void, profileName: string, setProfileName: (name: string) => void }) {
+    const [name, setName] = useState(profileName);
     const [username, setUsername] = useState("NeuraKing");
     const [bio, setBio] = useState("Your friendly AI companion!");
     const [dob, setDob] = useState<Date | undefined>(new Date("1998-01-01"));
@@ -43,6 +43,8 @@ function EditProfileDialog({ profileImage, setProfileImage }: { profileImage: st
 
     const handleSave = () => {
         localStorage.setItem("userProfileImage", profileImage);
+        localStorage.setItem("userProfileName", name);
+        setProfileName(name);
         toast({
             title: "Profile Updated",
             description: "Your new details have been saved.",
@@ -370,13 +372,13 @@ function PermissionsDialog() {
     )
 }
 
-function DialogManager({ option, profileImage, setProfileImage }: { option: (typeof settingsOptions)[number], profileImage: string, setProfileImage: (image: string) => void }) {
+function DialogManager({ option, profileImage, setProfileImage, profileName, setProfileName }: { option: (typeof settingsOptions)[number], profileImage: string, setProfileImage: (image: string) => void, profileName: string, setProfileName: (name: string) => void }) {
     if (option.action !== 'dialog' || !option.dialog) return null;
 
     let content = null;
     switch(option.dialog) {
         case 'editProfile':
-            content = <EditProfileDialog profileImage={profileImage} setProfileImage={setProfileImage} />;
+            content = <EditProfileDialog profileImage={profileImage} setProfileImage={setProfileImage} profileName={profileName} setProfileName={setProfileName} />;
             break;
         case 'privacy':
             content = <PrivacySettingsDialog />;
@@ -401,34 +403,38 @@ function DialogManager({ option, profileImage, setProfileImage }: { option: (typ
     )
 }
 
+const settingsOptions = [
+    { id: "account", icon: (props: { profileImage: string }) => (
+        <Avatar className="h-6 w-6">
+            <AvatarImage src={props.profileImage} data-ai-hint="person face" />
+            <AvatarFallback><User className="h-4 w-4" /></AvatarFallback>
+        </Avatar>
+    ), title: "Account", description: "Profile pic, name, status", action: "dialog", dialog: "editProfile" },
+    { id: "login-signup", icon: LogIn, title: "Login & Sign Up", description: "Create an account or sign in", action: "dialog", dialog: "login" },
+    { id: "permissions", icon: Lock, title: "Permissions", description: "Manage app permissions", action: "dialog", dialog: "permissions" },
+    { id: "make-default", icon: Star, title: "Make Default", description: "Set NeuraChat as your default app", action: "toast" },
+    { id: "cloud-sync", icon: DatabaseZap, title: "Memory & Cloud", description: "Storage use, clean/delete option", action: "switch" },
+    { id: "privacy", icon: ShieldCheck, title: "Privacy", description: "Data encryption, manual delete", action: "dialog", dialog: "privacy" },
+    { id: "smart-notifications", icon: BellRing, title: "Smart Notifications", description: "Enable or disable smart notifications", action: "switch" },
+    { id: "reminders", icon: CalendarIcon, title: "Reminders", description: "View and manage your reminders", href: "/reminders", action: "link" },
+    { id: "about", icon: Info, title: "About", description: "Version 68.7.526, check for updates", action: "none" },
+];
 
 export default function SettingsPage() {
     const { toast } = useToast();
     const [profileImage, setProfileImage] = useState("https://placehold.co/100x100.png");
+    const [profileName, setProfileName] = useState("Account");
 
     useEffect(() => {
         const savedImage = localStorage.getItem("userProfileImage");
         if (savedImage) {
             setProfileImage(savedImage);
         }
+        const savedName = localStorage.getItem("userProfileName");
+        if (savedName) {
+            setProfileName(savedName);
+        }
     }, []);
-
-    const settingsOptions = [
-        { id: "account", icon: () => (
-            <Avatar className="h-6 w-6">
-                <AvatarImage src={profileImage} data-ai-hint="person face" />
-                <AvatarFallback><User className="h-4 w-4" /></AvatarFallback>
-            </Avatar>
-        ), title: "Account", description: "Profile pic, name, status", action: "dialog", dialog: "editProfile" },
-        { id: "login-signup", icon: LogIn, title: "Login & Sign Up", description: "Create an account or sign in", action: "dialog", dialog: "login" },
-        { id: "permissions", icon: Lock, title: "Permissions", description: "Manage app permissions", action: "dialog", dialog: "permissions" },
-        { id: "make-default", icon: Star, title: "Make Default", description: "Set NeuraChat as your default app", action: "toast" },
-        { id: "cloud-sync", icon: DatabaseZap, title: "Memory & Cloud", description: "Storage use, clean/delete option", action: "switch" },
-        { id: "privacy", icon: ShieldCheck, title: "Privacy", description: "Data encryption, manual delete", action: "dialog", dialog: "privacy" },
-        { id: "smart-notifications", icon: BellRing, title: "Smart Notifications", description: "Enable or disable smart notifications", action: "switch" },
-        { id: "reminders", icon: CalendarIcon, title: "Reminders", description: "View and manage your reminders", href: "/reminders", action: "link" },
-        { id: "about", icon: Info, title: "About", description: "Version 68.7.526, check for updates", action: "none" },
-    ];
     
     const handleToastAction = (optionId: string) => {
         if (optionId === 'make-default') {
@@ -448,18 +454,20 @@ export default function SettingsPage() {
             <CardContent>
                 <div className="divide-y divide-border/60 -mx-6">
                     {settingsOptions.map((option) => {
+                       const title = option.id === 'account' ? profileName : option.title;
+                       const Icon = option.icon;
                        const content = (
                          <div className="py-4 flex items-center justify-between px-6">
                             <div className="flex items-center gap-4">
-                                <option.icon className="h-6 w-6 text-primary" />
+                                <Icon className="h-6 w-6 text-primary" profileImage={profileImage} />
                                 <div>
-                                    <h3 className="font-semibold">{option.title}</h3>
+                                    <h3 className="font-semibold">{title}</h3>
                                     <p className="text-sm text-muted-foreground">{option.description}</p>
                                 </div>
                             </div>
                             <div>
                                 {option.action === 'dialog' ? (
-                                    <DialogManager option={option} profileImage={profileImage} setProfileImage={setProfileImage} />
+                                    <DialogManager option={option} profileImage={profileImage} setProfileImage={setProfileImage} profileName={profileName} setProfileName={setProfileName} />
                                 ) : option.action === 'switch' ? (
                                     <Switch id={option.id} defaultChecked={option.id === 'smart-notifications' || option.id === 'cloud-sync'} />
                                 ) : option.action === 'toast' ? (
@@ -490,3 +498,5 @@ export default function SettingsPage() {
         </Card>
     );
 }
+
+    
