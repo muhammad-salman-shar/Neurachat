@@ -20,8 +20,8 @@ export default function SplashScreen() {
       setTimeout(() => {
         setShow(false);
         sessionStorage.setItem("splashScreenShown", "true");
-      }, 1000); // match animation duration
-    }, 2500); // 2.5s visible, 1s fade out
+      }, 500); // match animation duration
+    }, 1000); // 1s visible, 0.5s fade out
 
     return () => clearTimeout(timer);
   }, []);
