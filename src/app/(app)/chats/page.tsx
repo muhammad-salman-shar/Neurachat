@@ -29,6 +29,8 @@ export default function ChatsPage() {
     const [chats, setChats] = useState<Chat[]>(initialChats);
     const [selectedChats, setSelectedChats] = useState<Set<string>>(new Set());
     const [searchQuery, setSearchQuery] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
+
 
     const inSelectionMode = selectedChats.size > 0;
 
@@ -56,6 +58,8 @@ export default function ChatsPage() {
             console.error("Failed to parse chats from localStorage", error);
             // If parsing fails, just use the initial chats
             setChats(initialChats);
+        } finally {
+            setIsLoading(false);
         }
     }, []);
 
@@ -134,6 +138,14 @@ export default function ChatsPage() {
         </div>
     );
     
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-[calc(100vh-12rem)]">
+                <p>Loading chats...</p>
+            </div>
+        )
+    }
+
     if (chats.length === 0 && !searchQuery) {
         return (
             <div className="flex flex-col items-center justify-center h-[calc(100vh-12rem)] text-center text-muted-foreground p-4">

@@ -82,11 +82,13 @@ export default function NewChatPage() {
             <ScrollArea className="flex-1">
                 <Card>
                     <CardContent className="p-4 space-y-4">
-                        <Button variant="ghost" className="w-full justify-start gap-3 text-base h-auto p-2">
-                            <div className="bg-primary text-primary-foreground rounded-full p-2">
-                                <UserPlus className="h-6 w-6" />
-                            </div>
-                            <span>New Agent</span>
+                        <Button asChild variant="ghost" className="w-full justify-start gap-3 text-base h-auto p-2">
+                           <Link href="/agents">
+                               <div className="bg-primary text-primary-foreground rounded-full p-2">
+                                   <UserPlus className="h-6 w-6" />
+                               </div>
+                               <span>New Agent</span>
+                           </Link>
                         </Button>
                         <Button asChild variant="ghost" className="w-full justify-start gap-3 text-base h-auto p-2">
                            <Link href="/create-group">
