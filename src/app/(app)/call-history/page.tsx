@@ -5,10 +5,11 @@ import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Phone, Video, ArrowUpRight, ArrowDownLeft, Trash2, X, Check, Search } from "lucide-react";
+import { Phone, Video, ArrowUpRight, ArrowDownLeft, Trash2, X, Check, Search, PhoneForwarded } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import DialerDialog from "@/components/dialer-dialog";
 
 const initialCallHistory = [
     { name: "Friend Agent", avatar: "https://placehold.co/100x100.png", type: "outgoing", status: "Outgoing", time: "5 minutes ago", duration: "2m 15s", phone: "+11234567890" },
@@ -38,6 +39,7 @@ export default function CallHistoryPage() {
     const [selectedCalls, setSelectedCalls] = useState<Set<number>>(new Set());
     const [searchQuery, setSearchQuery] = useState("");
     const [filter, setFilter] = useState<CallType>("all");
+    const [isDialerOpen, setIsDialerOpen] = useState(false);
     
     const inSelectionMode = selectedCalls.size > 0;
 
@@ -115,92 +117,104 @@ export default function CallHistoryPage() {
     );
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Call History</CardTitle>
-                <CardDescription>Review your recent voice and video calls.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                {inSelectionMode ? (
-                    <SelectionHeader />
-                ) : (
-                    <div className="space-y-4 mb-4">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                            <Input
-                                placeholder="Search by name..."
-                                className="pl-10"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-                        </div>
-                        <div className="flex gap-2">
-                            {(['all', 'incoming', 'outgoing', 'missed'] as CallType[]).map(f => (
-                                <Button 
-                                    key={f}
-                                    variant={filter === f ? "default" : "outline"}
-                                    onClick={() => setFilter(f)}
-                                    className="capitalize"
-                                >
-                                    {f}
-                                </Button>
-                            ))}
-                        </div>
-                    </div>
-                )}
-                <div className="space-y-2">
-                    {filteredCalls.map((call) => {
-                         const isSelected = selectedCalls.has(call.originalIndex);
-                         return (
-                            <div 
-                                key={call.originalIndex} 
-                                onClick={(e) => handleCallClick(e, call.originalIndex)}
-                                onContextMenu={(e) => { e.preventDefault(); toggleSelection(call.originalIndex); }}
-                                className={cn(
-                                    "flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer relative",
-                                    isSelected && "bg-primary/10"
-                                )}
-                            >
-                                {isSelected && (
-                                    <div className="absolute top-2 left-2 h-5 w-5 bg-primary rounded-full flex items-center justify-center">
-                                        <Check className="h-4 w-4 text-primary-foreground" />
-                                    </div>
-                                )}
-                                <Avatar className={cn("h-12 w-12", isSelected && "opacity-60")}>
-                                    <AvatarImage src={call.avatar} data-ai-hint="person face" />
-                                    <AvatarFallback>{call.name.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                                <div className={cn("flex-grow", isSelected && "opacity-60")}>
-                                    <p className="font-semibold">{call.name}</p>
-                                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                        <CallStatusIcon type={call.type} />
-                                        <span>{call.status} - {call.time}</span>
-                                    </div>
-                                </div>
-                                <div className={cn("flex items-center gap-2", isSelected && "opacity-60")}>
-                                    {call.duration && <span className="text-sm text-muted-foreground">{call.duration}</span>}
-                                    <Button variant="ghost" size="icon" disabled={inSelectionMode} onClick={() => handleMakeCall(call.phone)}>
-                                        <Phone className="h-5 w-5" />
-                                    </Button>
-                                    <Button variant="ghost" size="icon" disabled={inSelectionMode} onClick={() => handleMakeCall(call.phone)}>
-                                        <Video className="h-5 w-5" />
-                                    </Button>
-                                </div>
+        <div className="relative h-[calc(100vh-10rem)]">
+            <Card className="h-full flex flex-col">
+                <CardHeader>
+                    <CardTitle>Call History</CardTitle>
+                    <CardDescription>Review your recent voice and video calls.</CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1 flex flex-col overflow-hidden">
+                    {inSelectionMode ? (
+                        <SelectionHeader />
+                    ) : (
+                        <div className="space-y-4 mb-4">
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                <Input
+                                    placeholder="Search by name..."
+                                    className="pl-10"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
                             </div>
-                        )
-                    })}
-                    {calls.length > 0 && filteredCalls.length === 0 && (
-                        <div className="text-center py-12 text-muted-foreground">
-                            <p>No calls match your search or filter.</p>
+                            <div className="flex gap-2">
+                                {(['all', 'incoming', 'outgoing', 'missed'] as CallType[]).map(f => (
+                                    <Button 
+                                        key={f}
+                                        variant={filter === f ? "default" : "outline"}
+                                        onClick={() => setFilter(f)}
+                                        className="capitalize"
+                                    >
+                                        {f}
+                                    </Button>
+                                ))}
+                            </div>
                         </div>
                     )}
-                    {calls.length === 0 && (
-                        <div className="text-center py-12 text-muted-foreground">
-                            <p>Your call history is empty.</p>
-                        </div>
-                    )}
-                </div>
-            </CardContent>
-        </Card>
+                    <div className="space-y-2 flex-1 overflow-y-auto">
+                        {filteredCalls.map((call) => {
+                             const isSelected = selectedCalls.has(call.originalIndex);
+                             return (
+                                <div 
+                                    key={call.originalIndex} 
+                                    onClick={(e) => handleCallClick(e, call.originalIndex)}
+                                    onContextMenu={(e) => { e.preventDefault(); toggleSelection(call.originalIndex); }}
+                                    className={cn(
+                                        "flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer relative",
+                                        isSelected && "bg-primary/10"
+                                    )}
+                                >
+                                    {isSelected && (
+                                        <div className="absolute top-2 left-2 h-5 w-5 bg-primary rounded-full flex items-center justify-center">
+                                            <Check className="h-4 w-4 text-primary-foreground" />
+                                        </div>
+                                    )}
+                                    <Avatar className={cn("h-12 w-12", isSelected && "opacity-60")}>
+                                        <AvatarImage src={call.avatar} data-ai-hint="person face" />
+                                        <AvatarFallback>{call.name.charAt(0)}</AvatarFallback>
+                                    </Avatar>
+                                    <div className={cn("flex-grow", isSelected && "opacity-60")}>
+                                        <p className="font-semibold">{call.name}</p>
+                                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                            <CallStatusIcon type={call.type} />
+                                            <span>{call.status} - {call.time}</span>
+                                        </div>
+                                    </div>
+                                    <div className={cn("flex items-center gap-2", isSelected && "opacity-60")}>
+                                        {call.duration && <span className="text-sm text-muted-foreground">{call.duration}</span>}
+                                        <Button variant="ghost" size="icon" disabled={inSelectionMode} onClick={() => handleMakeCall(call.phone)}>
+                                            <Phone className="h-5 w-5" />
+                                        </Button>
+                                        <Button variant="ghost" size="icon" disabled={inSelectionMode} onClick={() => handleMakeCall(call.phone)}>
+                                            <Video className="h-5 w-5" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            )
+                        })}
+                        {calls.length > 0 && filteredCalls.length === 0 && (
+                            <div className="text-center py-12 text-muted-foreground">
+                                <p>No calls match your search or filter.</p>
+                            </div>
+                        )}
+                        {calls.length === 0 && (
+                            <div className="text-center py-12 text-muted-foreground">
+                                <p>Your call history is empty.</p>
+                            </div>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+
+            <DialerDialog open={isDialerOpen} onOpenChange={setIsDialerOpen}>
+                <Button 
+                    className="fixed bottom-24 right-6 h-16 w-16 rounded-full shadow-lg"
+                    onClick={() => setIsDialerOpen(true)}
+                >
+                    <PhoneForwarded className="h-8 w-8" />
+                    <span className="sr-only">Open Dialer</span>
+                </Button>
+            </DialerDialog>
+        </div>
     );
 }
