@@ -22,10 +22,10 @@ export default function Header() {
   useEffect(() => {
     setMounted(true);
     if (isChatsPage) {
-      const animationShown = sessionStorage.getItem('neuraSaMuAnimationShown');
+      const animationShown = sessionStorage.getItem('neuraChatAnimationShown');
       if (!animationShown) {
         setAnimate(true);
-        sessionStorage.setItem('neuraSaMuAnimationShown', 'true');
+        sessionStorage.setItem('neuraChatAnimationShown', 'true');
       }
     }
   }, [isChatsPage]);
@@ -47,10 +47,10 @@ export default function Header() {
     }
     
     if (isChatsPage) {
-      return <h1 className={cn("text-2xl font-bold text-primary", animate && 'animate-fade-in-long')}>{ "NeuraSaMu" }</h1>;
+      return <h1 className={cn("text-2xl font-bold text-primary", animate && 'animate-fade-in-long')}>{ "NeuraChat" }</h1>;
     }
 
-    let pageTitle = "NeuraSaMu";
+    let pageTitle = "NeuraChat";
     if (pathname === '/library') pageTitle = "Library";
     if (pathname === '/archive') pageTitle = "Archive";
     if (pathname === '/settings') pageTitle = "Settings";

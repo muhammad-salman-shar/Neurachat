@@ -153,7 +153,7 @@ function LoginSignupDialog() {
     const renderInitial = () => (
         <>
             <DialogHeader>
-                <DialogTitle>Join NeuraSaMu</DialogTitle>
+                <DialogTitle>Join NeuraChat</DialogTitle>
                 <DialogDescription>
                     Create an account or sign in to sync your data across devices.
                 </DialogDescription>
@@ -369,8 +369,8 @@ export default function SettingsPage() {
     return (
         <Card className="border-border/60">
             <CardHeader>
-                <CardTitle>NeuraSaMu</CardTitle>
-                <CardDescription>Manage your NeuraSaMu experience.</CardDescription>
+                <CardTitle>NeuraChat</CardTitle>
+                <CardDescription>Manage your NeuraChat experience.</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="divide-y divide-border/60 -mx-6">

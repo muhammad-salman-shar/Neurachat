@@ -38,7 +38,7 @@ export default function SplashScreen() {
       )}
     >
       <h1 className="text-5xl font-bold text-primary tracking-wider font-headline">
-        NeuraSaMu
+        NeuraChat
       </h1>
     </div>
   );

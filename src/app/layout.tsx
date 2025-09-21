@@ -17,7 +17,7 @@ const poppins = Poppins({
 
 
 export const metadata: Metadata = {
-  title: "NeuraSaMu: Your AI Companion",
+  title: "NeuraChat: Your AI Companion",
   description: "The Ultimate AI Friend App",
 };
 

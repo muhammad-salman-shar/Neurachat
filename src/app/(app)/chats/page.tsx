@@ -138,7 +138,7 @@ export default function ChatsPage() {
         return (
             <div className="flex flex-col items-center justify-center h-[calc(100vh-12rem)] text-center text-muted-foreground p-4">
                 <MessageSquarePlus className="h-16 w-16 mb-4 text-primary" />
-                <h2 className="text-2xl font-bold text-foreground mb-2">Welcome to NeuraSaMu!</h2>
+                <h2 className="text-2xl font-bold text-foreground mb-2">Welcome to NeuraChat!</h2>
                 <p className="mb-1">Your journey to smarter communication starts here.</p>
                 <p>Tap the button below to add your first AI Agent or contact.</p>
                  <Button asChild className="mt-6">
