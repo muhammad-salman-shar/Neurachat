@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MessageSquare, Phone, Delete } from "lucide-react";
+import { MessageSquare, Phone, Delete, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
@@ -56,6 +56,13 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
     }
   };
   
+   const handleAddContact = () => {
+    if (number) {
+      router.push(`/create-contact?phone=${encodeURIComponent(number)}`);
+      onOpenChange(false);
+    }
+  };
+
   const handleDialogChange = (isOpen: boolean) => {
     onOpenChange(isOpen);
     if (!isOpen) {
@@ -81,15 +88,24 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
                     placeholder="Enter number"
                 />
             </div>
-             <div className="px-4 pb-4 text-center">
+             <div className="px-4 pb-4 flex gap-2">
                  <Button
                     variant="secondary"
-                    className="w-full h-12"
+                    className="flex-1 h-12"
                     onClick={handleMessage}
                     disabled={!number}
                 >
                     <MessageSquare className="mr-2 h-5 w-5" />
                     Send Message
+                </Button>
+                 <Button
+                    variant="secondary"
+                    className="flex-1 h-12"
+                    onClick={handleAddContact}
+                    disabled={!number}
+                >
+                    <UserPlus className="mr-2 h-5 w-5" />
+                    Add Contact
                 </Button>
             </div>
 
