@@ -5,10 +5,19 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 export default function SplashScreen() {
+  const [isMounted, setIsMounted] = useState(false);
   const [show, setShow] = useState(true);
   const [animationClass, setAnimationClass] = useState("animate-splash-in");
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) {
+      return;
+    }
+
     const splashShown = sessionStorage.getItem("splashScreenShown");
     if (splashShown) {
       setShow(false);
@@ -17,16 +26,17 @@ export default function SplashScreen() {
 
     const timer = setTimeout(() => {
       setAnimationClass("animate-splash-out");
-      setTimeout(() => {
+      const hideTimer = setTimeout(() => {
         setShow(false);
         sessionStorage.setItem("splashScreenShown", "true");
       }, 200); // match animation duration
+      return () => clearTimeout(hideTimer);
     }, 200); // 0.2s visible, 0.2s fade out
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [isMounted]);
 
-  if (!show) {
+  if (!show || !isMounted) {
     return null;
   }
 
