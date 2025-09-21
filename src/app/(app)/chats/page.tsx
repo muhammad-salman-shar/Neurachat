@@ -79,10 +79,14 @@ export default function ChatsPage() {
         });
     };
 
-    const handleChatClick = (e: React.MouseEvent, chatName: string) => {
+    const handleChatClick = (e: React.MouseEvent, chat: Chat) => {
         if (inSelectionMode) {
             e.preventDefault();
-            toggleSelection(chatName);
+            toggleSelection(chat.name);
+        } else {
+            e.preventDefault();
+            setActiveChat(chat);
+            setIsSheetOpen(true);
         }
     };
 
@@ -119,18 +123,6 @@ export default function ChatsPage() {
 
     const handleChatsAdded = () => {
         loadChats(); // Reload chats from localStorage
-    };
-
-    const handleAvatarClick = (e: React.MouseEvent, chat: Chat) => {
-        if (inSelectionMode) {
-            e.preventDefault();
-            toggleSelection(chat.name);
-            return;
-        }
-        e.preventDefault();
-        e.stopPropagation();
-        setActiveChat(chat);
-        setIsSheetOpen(true);
     };
 
     const filteredChats = chats.filter(chat =>
@@ -200,23 +192,20 @@ export default function ChatsPage() {
             <div className={cn("space-y-2", inSelectionMode && "pt-2")}>
                 {filteredChats.map((chat, index) => {
                     const isSelected = selectedChats.has(chat.name);
-                    const chatUrl = `/chat-detail?agent=${encodeURIComponent(chat.name)}&emoji=${encodeURIComponent(chat.emoji)}&avatar=${encodeURIComponent(chat.avatar)}&phone=${encodeURIComponent(chat.phone || '')}`;
-
+                    
                     return (
                         <div
                             key={`${chat.name}-${index}`}
                             onContextMenu={(e) => { e.preventDefault(); toggleSelection(chat.name); }}
-                            onClick={(e) => handleChatClick(e, chat.name)}
-                            className={cn("rounded-2xl transition-colors relative", isSelected && "bg-primary/10")}
+                            onClick={(e) => handleChatClick(e, chat)}
+                            className={cn("rounded-2xl transition-colors relative cursor-pointer", isSelected && "bg-primary/10")}
                         >
                             <div className="flex items-center gap-4 p-3 rounded-2xl hover:bg-card">
                                 <div className="relative">
-                                    <button onClick={(e) => handleAvatarClick(e, chat)} className="focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full">
-                                        <Avatar className="h-14 w-14 text-2xl">
-                                            <AvatarImage src={chat.avatar} data-ai-hint={chat.hint} />
-                                            <AvatarFallback>{chat.emoji}</AvatarFallback>
-                                        </Avatar>
-                                    </button>
+                                    <Avatar className="h-14 w-14 text-2xl">
+                                        <AvatarImage src={chat.avatar} data-ai-hint={chat.hint} />
+                                        <AvatarFallback>{chat.emoji}</AvatarFallback>
+                                    </Avatar>
                                     {chat.unread && !isSelected && <span className="absolute bottom-0 right-0 block h-3.5 w-3.5 rounded-full bg-green-500 border-2 border-background"></span>}
                                     {isSelected && (
                                         <div className="absolute top-0 left-0 h-full w-full bg-black/50 rounded-full flex items-center justify-center pointer-events-none">
@@ -224,20 +213,15 @@ export default function ChatsPage() {
                                         </div>
                                     )}
                                 </div>
-                                <Link href={chatUrl} className="flex-1 block hover:no-underline">
-                                    <div className="flex-1">
-                                        <p className="font-bold text-lg text-foreground">{chat.name}</p>
-                                        <p className="text-sm text-muted-foreground truncate">{chat.message}</p>
-                                    </div>
-                                </Link>
-                                <Link href={chatUrl} className="block hover:no-underline">
-                                    <div className="text-right">
-                                         {chat.time && <p className="text-xs text-muted-foreground">{chat.time}</p>}
-                                         {chat.unread && <Badge className="mt-1 bg-primary h-6 w-6 flex items-center justify-center p-0">{chat.isGroup ? '' : '1'}</Badge>}
-                                    </div>
-                                </Link>
+                                <div className="flex-1">
+                                    <p className="font-bold text-lg text-foreground">{chat.name}</p>
+                                    <p className="text-sm text-muted-foreground truncate">{chat.message}</p>
+                                </div>
+                                <div className="text-right">
+                                     {chat.time && <p className="text-xs text-muted-foreground">{chat.time}</p>}
+                                     {chat.unread && <Badge className="mt-1 bg-primary h-6 w-6 flex items-center justify-center p-0">{chat.isGroup ? '' : '1'}</Badge>}
+                                </div>
                             </div>
-                            <Link href={chatUrl} className="absolute inset-0 z-0"/>
                         </div>
                     )
                 })}
