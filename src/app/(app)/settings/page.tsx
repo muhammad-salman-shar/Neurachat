@@ -63,7 +63,10 @@ function EditProfileDialog({ profileImage, setProfileImage, profileName, setProf
                  <div className="flex flex-col items-center gap-4">
                     <div className="relative">
                         <input type="file" ref={imageInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
-                        <img src={profileImage} alt="Profile" className="rounded-full w-24 h-24 object-cover cursor-pointer" data-ai-hint="person face" onClick={() => imageInputRef.current?.click()} />
+                        <Avatar className="h-24 w-24 cursor-pointer" onClick={() => imageInputRef.current?.click()}>
+                            <AvatarImage src={profileImage} alt="Profile" data-ai-hint="person face" />
+                            <AvatarFallback><User className="h-10 w-10"/></AvatarFallback>
+                        </Avatar>
                         <Button size="icon" className="absolute bottom-0 right-0 rounded-full h-8 w-8" onClick={() => imageInputRef.current?.click()}>
                             <Camera className="h-4 w-4" />
                         </Button>
@@ -404,12 +407,7 @@ function DialogManager({ option, profileImage, setProfileImage, profileName, set
 }
 
 const settingsOptions = [
-    { id: "account", icon: ({ profileImage, ...props }: { profileImage: string; [key: string]: any }) => (
-        <Avatar {...props}>
-            <AvatarImage src={profileImage} data-ai-hint="person face" />
-            <AvatarFallback><User className="h-4 w-4" /></AvatarFallback>
-        </Avatar>
-    ), title: "Account", description: "Profile pic, name, status", action: "dialog", dialog: "editProfile" },
+    { id: "account", icon: User, title: "Account", description: "Profile pic, name, status", action: "dialog", dialog: "editProfile" },
     { id: "login-signup", icon: LogIn, title: "Login & Sign Up", description: "Create an account or sign in", action: "dialog", dialog: "login" },
     { id: "permissions", icon: Lock, title: "Permissions", description: "Manage app permissions", action: "dialog", dialog: "permissions" },
     { id: "make-default", icon: Star, title: "Make Default", description: "Set NeuraChat as your default app", action: "toast" },
@@ -456,10 +454,19 @@ export default function SettingsPage() {
                     {settingsOptions.map((option) => {
                        const title = option.id === 'account' ? profileName : option.title;
                        const Icon = option.icon;
+                       const isAccount = option.id === 'account';
+
                        const content = (
                          <div className="py-4 flex items-center justify-between px-6">
                             <div className="flex items-center gap-4">
-                                <Icon className="h-6 w-6 text-primary" profileImage={profileImage} />
+                                {isAccount ? (
+                                    <Avatar className="h-6 w-6">
+                                        <AvatarImage src={profileImage} data-ai-hint="person face" />
+                                        <AvatarFallback><User className="h-4 w-4" /></AvatarFallback>
+                                    </Avatar>
+                                ) : (
+                                    <Icon className="h-6 w-6 text-primary" />
+                                )}
                                 <div>
                                     <h3 className="font-semibold">{title}</h3>
                                     <p className="text-sm text-muted-foreground">{option.description}</p>
