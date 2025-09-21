@@ -5,13 +5,18 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
-import { User, DatabaseZap, ShieldCheck, Info, BellRing, CalendarIcon, Mic, Video, LogIn, Mail, KeyRound, Phone, UserPlus, ArrowLeft, Camera, FolderOpen, Lock, Star } from "lucide-react"
+import { User, DatabaseZap, ShieldCheck, Info, BellRing, CalendarIcon, Mic, Video, LogIn, Mail, KeyRound, Phone, UserPlus, ArrowLeft, Camera, FolderOpen, Lock, Star, Calendar as CalendarIconLucide } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
+import { format } from "date-fns"
+import { Textarea } from "@/components/ui/textarea"
+import { cn } from "@/lib/utils"
 
 const settingsOptions = [
     { id: "account", icon: User, title: "Account", description: "Profile pic, name, status", action: "dialog", dialog: "editProfile" },
@@ -27,7 +32,10 @@ const settingsOptions = [
 
 function EditProfileDialog() {
     const [name, setName] = useState("Sam");
-    const [year, setYear] = useState<string>("1998");
+    const [username, setUsername] = useState("NeuraKing");
+    const [bio, setBio] = useState("Your friendly AI companion!");
+    const [dob, setDob] = useState<Date | undefined>(new Date("1998-01-01"));
+    const [showActivity, setShowActivity] = useState(true);
     const { toast } = useToast();
 
     const handleSave = () => {
@@ -36,9 +44,6 @@ function EditProfileDialog() {
             description: "Your new details have been saved.",
         });
     };
-
-    const currentYear = new Date().getFullYear();
-    const years = Array.from({ length: currentYear - 1920 + 1 }, (_, i) => currentYear - i);
 
     return (
         <DialogContent className="sm:max-w-[425px]">
@@ -49,28 +54,54 @@ function EditProfileDialog() {
                 </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">
-                        Name
-                    </Label>
-                    <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="col-span-3" />
+                 <div className="flex flex-col items-center gap-4">
+                    <div className="relative">
+                        <img src="https://placehold.co/100x100.png" alt="Profile" className="rounded-full w-24 h-24" data-ai-hint="person face" />
+                        <Button size="icon" className="absolute bottom-0 right-0 rounded-full h-8 w-8">
+                            <Camera className="h-4 w-4" />
+                        </Button>
+                    </div>
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="dob" className="text-right">
-                        Birth Year
-                    </Label>
-                    <Select onValueChange={setYear} defaultValue={year}>
-                        <SelectTrigger className="col-span-3">
-                            <SelectValue placeholder="Select a year" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {years.map((y) => (
-                                <SelectItem key={y} value={y.toString()}>
-                                    {y}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                <div className="grid gap-2">
+                    <Label htmlFor="name">Name</Label>
+                    <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
+                </div>
+                 <div className="grid gap-2">
+                    <Label htmlFor="username">Username</Label>
+                    <Input id="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="@yourhandle" />
+                </div>
+                <div className="grid gap-2">
+                    <Label htmlFor="bio">Bio/Status</Label>
+                    <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} maxLength={150} placeholder="Tell us about yourself" />
+                </div>
+                <div className="grid gap-2">
+                    <Label htmlFor="dob">Date of Birth</Label>
+                     <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant={"outline"}
+                                className={cn(
+                                    "justify-start text-left font-normal",
+                                    !dob && "text-muted-foreground"
+                                )}
+                            >
+                                <CalendarIconLucide className="mr-2 h-4 w-4" />
+                                {dob ? format(dob, "PPP") : <span>Pick a date</span>}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                            <Calendar
+                                mode="single"
+                                selected={dob}
+                                onSelect={setDob}
+                                initialFocus
+                            />
+                        </PopoverContent>
+                    </Popover>
+                </div>
+                 <div className="flex items-center justify-between pt-2">
+                    <Label htmlFor="activity-status">Show Activity Status</Label>
+                    <Switch id="activity-status" checked={showActivity} onCheckedChange={setShowActivity} />
                 </div>
             </div>
             <DialogFooter>
