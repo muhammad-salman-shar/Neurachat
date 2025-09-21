@@ -5,7 +5,7 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
-import { User, DatabaseZap, ShieldCheck, Info, BellRing, CalendarIcon, Mic, Video, LogIn, Mail, KeyRound, Phone, UserPlus, ArrowLeft, Camera, FolderOpen, Lock } from "lucide-react"
+import { User, DatabaseZap, ShieldCheck, Info, BellRing, CalendarIcon, Mic, Video, LogIn, Mail, KeyRound, Phone, UserPlus, ArrowLeft, Camera, FolderOpen, Lock, Star } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -17,6 +17,7 @@ const settingsOptions = [
     { id: "account", icon: User, title: "Account", description: "Profile pic, name, status", action: "dialog", dialog: "editProfile" },
     { id: "login-signup", icon: LogIn, title: "Login & Sign Up", description: "Create an account or sign in", action: "dialog", dialog: "login" },
     { id: "permissions", icon: Lock, title: "Permissions", description: "Manage app permissions", action: "dialog", dialog: "permissions" },
+    { id: "make-default", icon: Star, title: "Make Default", description: "Set NeuraChat as your default app", action: "toast" },
     { id: "cloud-sync", icon: DatabaseZap, title: "Memory & Cloud", description: "Storage use, clean/delete option", action: "switch" },
     { id: "privacy", icon: ShieldCheck, title: "Privacy", description: "Data encryption, manual delete", action: "dialog", dialog: "privacy" },
     { id: "smart-notifications", icon: BellRing, title: "Smart Notifications", description: "Enable or disable smart notifications", action: "switch" },
@@ -366,6 +367,17 @@ function DialogManager({ option }: { option: (typeof settingsOptions)[number] })
 
 
 export default function SettingsPage() {
+    const { toast } = useToast();
+
+    const handleToastAction = (optionId: string) => {
+        if (optionId === 'make-default') {
+            toast({
+                title: "Web App Limitation",
+                description: "Browsers do not allow web apps to be set as the default for system functions like messaging or calls.",
+            });
+        }
+    };
+
     return (
         <Card className="border-border/60">
             <CardHeader>
@@ -389,6 +401,10 @@ export default function SettingsPage() {
                                     <DialogManager option={option} />
                                 ) : option.action === 'switch' ? (
                                     <Switch id={option.id} defaultChecked={option.id === 'smart-notifications' || option.id === 'cloud-sync'} />
+                                ) : option.action === 'toast' ? (
+                                    <Button variant="outline" onClick={() => handleToastAction(option.id)}>
+                                        Set Default
+                                    </Button>
                                 ) : null}
                             </div>
                          </div>
