@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState, useRef, ChangeEvent } from "react"
+import { useState, useRef, ChangeEvent, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
@@ -17,27 +17,15 @@ import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-const settingsOptions = [
-    { id: "account", icon: User, title: "Account", description: "Profile pic, name, status", action: "dialog", dialog: "editProfile" },
-    { id: "login-signup", icon: LogIn, title: "Login & Sign Up", description: "Create an account or sign in", action: "dialog", dialog: "login" },
-    { id: "permissions", icon: Lock, title: "Permissions", description: "Manage app permissions", action: "dialog", dialog: "permissions" },
-    { id: "make-default", icon: Star, title: "Make Default", description: "Set NeuraChat as your default app", action: "toast" },
-    { id: "cloud-sync", icon: DatabaseZap, title: "Memory & Cloud", description: "Storage use, clean/delete option", action: "switch" },
-    { id: "privacy", icon: ShieldCheck, title: "Privacy", description: "Data encryption, manual delete", action: "dialog", dialog: "privacy" },
-    { id: "smart-notifications", icon: BellRing, title: "Smart Notifications", description: "Enable or disable smart notifications", action: "switch" },
-    { id: "reminders", icon: CalendarIcon, title: "Reminders", description: "View and manage your reminders", href: "/reminders", action: "link" },
-    { id: "about", icon: Info, title: "About", description: "Version 68.7.526, check for updates", action: "none" },
-];
-
-function EditProfileDialog() {
+function EditProfileDialog({ profileImage, setProfileImage }: { profileImage: string, setProfileImage: (image: string) => void }) {
     const [name, setName] = useState("Sam");
     const [username, setUsername] = useState("NeuraKing");
     const [bio, setBio] = useState("Your friendly AI companion!");
     const [dob, setDob] = useState<Date | undefined>(new Date("1998-01-01"));
     const [showActivity, setShowActivity] = useState(true);
     const { toast } = useToast();
-    const [profileImage, setProfileImage] = useState("https://placehold.co/100x100.png");
     const imageInputRef = useRef<HTMLInputElement>(null);
 
     const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +33,8 @@ function EditProfileDialog() {
             const reader = new FileReader();
             reader.onload = (event) => {
                 if (event.target?.result) {
-                    setProfileImage(event.target.result as string);
+                    const newImage = event.target.result as string;
+                    setProfileImage(newImage);
                 }
             };
             reader.readAsDataURL(e.target.files[0]);
@@ -53,6 +42,7 @@ function EditProfileDialog() {
     };
 
     const handleSave = () => {
+        localStorage.setItem("userProfileImage", profileImage);
         toast({
             title: "Profile Updated",
             description: "Your new details have been saved.",
@@ -380,13 +370,13 @@ function PermissionsDialog() {
     )
 }
 
-function DialogManager({ option }: { option: (typeof settingsOptions)[number] }) {
+function DialogManager({ option, profileImage, setProfileImage }: { option: (typeof settingsOptions)[number], profileImage: string, setProfileImage: (image: string) => void }) {
     if (option.action !== 'dialog' || !option.dialog) return null;
 
     let content = null;
     switch(option.dialog) {
         case 'editProfile':
-            content = <EditProfileDialog />;
+            content = <EditProfileDialog profileImage={profileImage} setProfileImage={setProfileImage} />;
             break;
         case 'privacy':
             content = <PrivacySettingsDialog />;
@@ -414,7 +404,32 @@ function DialogManager({ option }: { option: (typeof settingsOptions)[number] })
 
 export default function SettingsPage() {
     const { toast } = useToast();
+    const [profileImage, setProfileImage] = useState("https://placehold.co/100x100.png");
 
+    useEffect(() => {
+        const savedImage = localStorage.getItem("userProfileImage");
+        if (savedImage) {
+            setProfileImage(savedImage);
+        }
+    }, []);
+
+    const settingsOptions = [
+        { id: "account", icon: () => (
+            <Avatar className="h-6 w-6">
+                <AvatarImage src={profileImage} data-ai-hint="person face" />
+                <AvatarFallback><User className="h-4 w-4" /></AvatarFallback>
+            </Avatar>
+        ), title: "Account", description: "Profile pic, name, status", action: "dialog", dialog: "editProfile" },
+        { id: "login-signup", icon: LogIn, title: "Login & Sign Up", description: "Create an account or sign in", action: "dialog", dialog: "login" },
+        { id: "permissions", icon: Lock, title: "Permissions", description: "Manage app permissions", action: "dialog", dialog: "permissions" },
+        { id: "make-default", icon: Star, title: "Make Default", description: "Set NeuraChat as your default app", action: "toast" },
+        { id: "cloud-sync", icon: DatabaseZap, title: "Memory & Cloud", description: "Storage use, clean/delete option", action: "switch" },
+        { id: "privacy", icon: ShieldCheck, title: "Privacy", description: "Data encryption, manual delete", action: "dialog", dialog: "privacy" },
+        { id: "smart-notifications", icon: BellRing, title: "Smart Notifications", description: "Enable or disable smart notifications", action: "switch" },
+        { id: "reminders", icon: CalendarIcon, title: "Reminders", description: "View and manage your reminders", href: "/reminders", action: "link" },
+        { id: "about", icon: Info, title: "About", description: "Version 68.7.526, check for updates", action: "none" },
+    ];
+    
     const handleToastAction = (optionId: string) => {
         if (optionId === 'make-default') {
             toast({
@@ -444,7 +459,7 @@ export default function SettingsPage() {
                             </div>
                             <div>
                                 {option.action === 'dialog' ? (
-                                    <DialogManager option={option} />
+                                    <DialogManager option={option} profileImage={profileImage} setProfileImage={setProfileImage} />
                                 ) : option.action === 'switch' ? (
                                     <Switch id={option.id} defaultChecked={option.id === 'smart-notifications' || option.id === 'cloud-sync'} />
                                 ) : option.action === 'toast' ? (
