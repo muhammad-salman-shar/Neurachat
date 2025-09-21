@@ -2,7 +2,7 @@
 "use client";
 
 import { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -11,9 +11,22 @@ import { Phone, MessageSquare, Video } from 'lucide-react';
 
 function ProfileContent() {
     const searchParams = useSearchParams();
+    const router = useRouter();
     const name = searchParams.get('name') || 'Unknown User';
     const avatar = searchParams.get('avatar') || 'https://placehold.co/128x128.png';
     const phone = searchParams.get('phone') || 'No phone number';
+
+    const handleMakeCall = () => {
+        if (phone && phone !== 'No phone number') {
+            window.location.href = `tel:${phone}`;
+        } else {
+            alert("No phone number available for this contact.");
+        }
+    };
+
+    const handleSendMessage = () => {
+        router.push(`/chat-detail?agent=${encodeURIComponent(name)}&avatar=${encodeURIComponent(avatar)}&phone=${encodeURIComponent(phone)}`);
+    };
 
     return (
         <div className="flex flex-col items-center pt-8 space-y-6">
@@ -30,11 +43,11 @@ function ProfileContent() {
             </div>
 
             <div className="flex gap-4">
-                <Button size="lg" className="gap-2">
+                <Button size="lg" className="gap-2" onClick={handleSendMessage}>
                     <MessageSquare />
                     Message
                 </Button>
-                <Button size="lg" variant="outline" className="gap-2">
+                <Button size="lg" variant="outline" className="gap-2" onClick={handleMakeCall}>
                     <Phone />
                     Call
                 </Button>

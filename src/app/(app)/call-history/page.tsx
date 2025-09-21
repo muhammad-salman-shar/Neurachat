@@ -9,11 +9,11 @@ import { Phone, Video, ArrowUpRight, ArrowDownLeft, Trash2, X, Check } from "luc
 import { cn } from "@/lib/utils";
 
 const initialCallHistory = [
-    { name: "Friend Agent", avatar: "https://placehold.co/100x100.png", type: "outgoing", status: "Outgoing", time: "5 minutes ago", duration: "2m 15s" },
-    { name: "Teacher Agent", avatar: "https://placehold.co/100x100.png", type: "incoming", status: "Incoming", time: "1 hour ago", duration: "10m 30s" },
-    { name: "Boss Agent", avatar: "https://placehold.co/100x100.png", type: "missed", status: "Missed Call", time: "Yesterday", duration: "" },
-    { name: "Girlfriend Agent", avatar: "https://placehold.co/100x100.png", type: "outgoing", status: "Outgoing", time: "Yesterday", duration: "30m 05s" },
-    { name: "Gym Coach", avatar: "https://placehold.co/100x100.png", type: "incoming", status: "Incoming", time: "2 days ago", duration: "5m 45s" },
+    { name: "Friend Agent", avatar: "https://placehold.co/100x100.png", type: "outgoing", status: "Outgoing", time: "5 minutes ago", duration: "2m 15s", phone: "+11234567890" },
+    { name: "Teacher Agent", avatar: "https://placehold.co/100x100.png", type: "incoming", status: "Incoming", time: "1 hour ago", duration: "10m 30s", phone: "+12345678901" },
+    { name: "Boss Agent", avatar: "https://placehold.co/100x100.png", type: "missed", status: "Missed Call", time: "Yesterday", duration: "", phone: "+13456789012" },
+    { name: "Girlfriend Agent", avatar: "https://placehold.co/100x100.png", type: "outgoing", status: "Outgoing", time: "Yesterday", duration: "30m 05s", phone: "+14567890123" },
+    { name: "Gym Coach", avatar: "https://placehold.co/100x100.png", type: "incoming", status: "Incoming", time: "2 days ago", duration: "5m 45s", phone: "+15678901234" },
 ];
 
 const CallStatusIcon = ({ type }: { type: string }) => {
@@ -65,6 +65,12 @@ export default function CallHistoryPage() {
     const handleClearAll = () => {
         setCalls([]);
         setSelectedCalls(new Set());
+    };
+    
+    const handleMakeCall = (phoneNumber: string) => {
+        if (phoneNumber) {
+            window.location.href = `tel:${phoneNumber}`;
+        }
     };
 
     const SelectionHeader = () => (
@@ -123,10 +129,10 @@ export default function CallHistoryPage() {
                                 </div>
                                 <div className={cn("flex items-center gap-2", isSelected && "opacity-60")}>
                                     {call.duration && <span className="text-sm text-muted-foreground">{call.duration}</span>}
-                                    <Button variant="ghost" size="icon" disabled={inSelectionMode}>
+                                    <Button variant="ghost" size="icon" disabled={inSelectionMode} onClick={() => handleMakeCall(call.phone)}>
                                         <Phone className="h-5 w-5" />
                                     </Button>
-                                    <Button variant="ghost" size="icon" disabled={inSelectionMode}>
+                                    <Button variant="ghost" size="icon" disabled={inSelectionMode} onClick={() => handleMakeCall(call.phone)}>
                                         <Video className="h-5 w-5" />
                                     </Button>
                                 </div>

@@ -136,6 +136,14 @@ function ChatContent() {
     setSelectedMessages(new Set());
   }
 
+  const handleMakeCall = () => {
+    if (contactPhone && contactPhone !== 'undefined') {
+      window.location.href = `tel:${contactPhone}`;
+    } else {
+      alert("No phone number available for this contact.");
+    }
+  };
+
   const inSelectionMode = selectedMessages.size > 0;
 
   return (
@@ -266,11 +274,11 @@ function ChatContent() {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={handleMakeCall}>
                     <Video className="mr-2 h-4 w-4" />
                     <span>Video Call</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={handleMakeCall}>
                     <Mic className="mr-2 h-4 w-4" />
                     <span>Voice Call</span>
                 </DropdownMenuItem>
