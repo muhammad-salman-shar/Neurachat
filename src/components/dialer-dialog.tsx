@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MessageSquare, Phone, Delete } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+
 
 type DialerDialogProps = {
   open: boolean;
@@ -64,9 +66,11 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
   return (
     <Dialog open={open} onOpenChange={handleDialogChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] flex flex-col h-[70vh] p-4">
+      <DialogContent className="sm:max-w-[425px] flex flex-col p-4 top-auto bottom-0 translate-x-[-50%] translate-y-0 rounded-b-none sm:rounded-b-lg data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom">
         <DialogHeader>
-          <DialogTitle className="sr-only">Dialer</DialogTitle>
+           <VisuallyHidden>
+            <DialogTitle>Dialer</DialogTitle>
+          </VisuallyHidden>
         </DialogHeader>
         <div className="flex-grow flex flex-col justify-end">
             <div className="p-4 text-center">
