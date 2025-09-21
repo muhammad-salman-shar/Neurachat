@@ -96,11 +96,26 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
     }
   };
 
+  const handleBackspacePressStart = () => {
+    longPressTimer.current = setTimeout(() => {
+      handleClear();
+      longPressTimer.current = null;
+    }, 700);
+  };
+
+  const handleBackspacePressEnd = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+      handleBackspace();
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={handleDialogChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px] flex flex-col p-4 top-auto bottom-0 translate-x-[-50%] translate-y-0 rounded-b-none sm:rounded-b-lg data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom">
-        <DialogHeader className="text-center">
+        <DialogHeader className="text-center sr-only">
             <DialogTitle>Dialer</DialogTitle>
         </DialogHeader>
         <DialogClose asChild>
@@ -145,8 +160,9 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
             </div>
 
              <div className="flex justify-around items-center p-4">
-                <Button variant="ghost" className="h-20 w-20 rounded-full" onClick={handleMessage} disabled={!number}>
-                    <MessageSquare className="h-7 w-7" />
+                <Button variant="ghost" className="h-20 w-20 rounded-full flex-col gap-1" onClick={handleMessage} disabled={!number}>
+                    <MessageSquare className="h-6 w-6" />
+                    <span className="text-xs">Message</span>
                 </Button>
                 <Button
                     variant="default"
@@ -159,13 +175,21 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
                 <Button
                     variant="ghost"
                     className="h-20 w-20 rounded-full"
-                    onClick={handleBackspace}
-                    onLongPress={handleClear}
+                    onMouseDown={handleBackspacePressStart}
+                    onMouseUp={handleBackspacePressEnd}
+                    onTouchStart={handleBackspacePressStart}
+                    onTouchEnd={handleBackspacePressEnd}
                     disabled={!number}
                 >
                     <Delete className="h-8 w-8" />
                 </Button>
             </div>
+             <div className="flex justify-center items-center pb-4">
+                <Button variant="link" onClick={handleAddContact} disabled={!number}>
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  Add to Contacts
+                </Button>
+             </div>
         </div>
       </DialogContent>
     </Dialog>
