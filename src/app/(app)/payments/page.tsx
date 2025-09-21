@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import AddPaymentAccountWithOTP from "@/components/add-payment-account-with-otp";
+
 
 const transactions = [
     { name: "Friend Agent", type: "Sent", amount: "- PKR 500", status: "Success", time: "2:30 PM", avatar: "https://placehold.co/40x40.png" },
@@ -21,107 +23,15 @@ const JazzCashIcon = () => <svg className="h-6 w-6" viewBox="0 0 24 24"><path fi
 const EasypaisaIcon = () => <svg className="h-6 w-6" viewBox="0 0 24 24"><path fill="#00B14F" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><path fill="#fff" d="M15.5 12.5h-1.87l-1.63-3.26-1.63 3.26H8.5l3-6 3 6z"/></svg>;
 const PaypalIcon = () => <svg className="h-6 w-6" viewBox="0 0 24 24"><path fill="#003087" d="M20.57 6.09c-.27-.64-1.16-1.09-2.1-1.09H8.54c-.9 0-1.65.41-1.95 1.25L4 16.59c-.24.69.21 1.41.93 1.41h3.19c.6 0 1.12-.42 1.26-1.01l.01-.06.71-3.65c.12-.62.63-1.02 1.24-1.02h2.2c1.33 0 2.22-.92 2.38-2.29l.17-1.89zm-4.48 3.65c-.17 1.07-.97 1.83-1.98 1.83h-1.89c-.58 0-1.08-.38-1.2-.93l-.8-4.23c-.1-.53.28-1.04.8-1.04h2.2c.86 0 1.5.6 1.63 1.45l.24 1.92z"/></svg>;
 
-type Account = {
+export type Account = {
     provider: 'JazzCash' | 'Easypaisa' | 'PayPal' | 'Bank';
     identifier: string;
 };
 
-type AddAccountStep = 'selection' | 'form';
-type Provider = 'JazzCash' | 'Easypaisa' | 'PayPal' | 'Bank';
-
-function AddAccountDialog({ onAccountAdded }: { onAccountAdded: (account: Account) => void }) {
-    const [step, setStep] = useState<AddAccountStep>('selection');
-    const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
-    const [identifier, setIdentifier] = useState("");
-    const [bankName, setBankName] = useState("");
-
-    const handleSave = () => {
-        if (!selectedProvider || !identifier) return;
-        const finalIdentifier = selectedProvider === 'Bank' ? `${bankName} - ${identifier}` : identifier;
-        onAccountAdded({ provider: selectedProvider, identifier: finalIdentifier });
-        // Reset state and close dialog
-        setStep('selection');
-        setSelectedProvider(null);
-        setIdentifier("");
-        setBankName("");
-    };
-
-    const renderSelection = () => (
-        <>
-            <DialogHeader>
-                <DialogTitle>Add Payment Account</DialogTitle>
-                <DialogDescription>Select a provider to link your account.</DialogDescription>
-            </DialogHeader>
-            <div className="grid grid-cols-2 gap-4 py-4">
-                <Button variant="outline" className="h-20 flex-col gap-2" onClick={() => { setSelectedProvider('JazzCash'); setStep('form'); }}><JazzCashIcon /> JazzCash</Button>
-                <Button variant="outline" className="h-20 flex-col gap-2" onClick={() => { setSelectedProvider('Easypaisa'); setStep('form'); }}><EasypaisaIcon /> Easypaisa</Button>
-                <Button variant="outline" className="h-20 flex-col gap-2" onClick={() => { setSelectedProvider('PayPal'); setStep('form'); }}><PaypalIcon /> PayPal</Button>
-                <Button variant="outline" className="h-20 flex-col gap-2" onClick={() => { setSelectedProvider('Bank'); setStep('form'); }}><Landmark /> Bank Account</Button>
-            </div>
-        </>
-    );
-
-    const renderForm = () => {
-        if (!selectedProvider) return null;
-        
-        let label = "";
-        let placeholder = "";
-        let type: "text" | "email" | "tel" = "text";
-
-        switch(selectedProvider) {
-            case 'JazzCash':
-            case 'Easypaisa':
-                label = "Phone Number";
-                placeholder = "03001234567";
-                type = "tel";
-                break;
-            case 'PayPal':
-                label = "PayPal Email";
-                placeholder = "user@example.com";
-                type = "email";
-                break;
-            case 'Bank':
-                label = "Account Number";
-                placeholder = "Enter account number";
-                type = "text";
-                break;
-        }
-
-        return (
-            <>
-                <DialogHeader>
-                    <DialogTitle>Link {selectedProvider} Account</DialogTitle>
-                    <DialogDescription>Enter your account details below.</DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                    {selectedProvider === 'Bank' && (
-                        <div>
-                            <Label htmlFor="bankName">Bank Name</Label>
-                            <Input id="bankName" value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder="e.g., HBL" />
-                        </div>
-                    )}
-                    <div>
-                        <Label htmlFor="identifier">{label}</Label>
-                        <Input id="identifier" value={identifier} onChange={(e) => setIdentifier(e.target.value)} placeholder={placeholder} type={type} />
-                    </div>
-                </div>
-                 <DialogClose asChild>
-                    <Button onClick={handleSave} className="w-full">Save Account</Button>
-                </DialogClose>
-            </>
-        )
-    };
-    
-    return (
-      <DialogContent>
-        {step === 'selection' ? renderSelection() : renderForm()}
-      </DialogContent>
-    )
-}
-
 export default function PaymentsPage() {
     const [accounts, setAccounts] = useState<Account[]>([]);
     const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
+    const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
 
     const handleAccountAdded = (account: Account) => {
         const newAccounts = [...accounts, account];
@@ -129,6 +39,7 @@ export default function PaymentsPage() {
         if (!selectedAccount) {
             setSelectedAccount(account.identifier);
         }
+        setIsAddAccountOpen(false); // Close the dialog after adding
     };
     
     if (accounts.length === 0) {
@@ -136,14 +47,16 @@ export default function PaymentsPage() {
             <div className="flex flex-col items-center justify-center h-[calc(100vh-12rem)] text-center text-muted-foreground p-4">
                 <Banknote className="h-16 w-16 mb-4 text-primary" />
                 <h2 className="text-2xl font-bold text-foreground mb-2">No payment account added yet.</h2>
-                <Dialog>
+                <Dialog open={isAddAccountOpen} onOpenChange={setIsAddAccountOpen}>
                     <DialogTrigger asChild>
                         <Button className="mt-6">
                             <Plus className="mr-2 h-4 w-4" />
                             Add Payment Account
                         </Button>
                     </DialogTrigger>
-                    <AddAccountDialog onAccountAdded={handleAccountAdded} />
+                    <DialogContent>
+                      <AddPaymentAccountWithOTP onAccountAdded={handleAccountAdded} onComplete={() => setIsAddAccountOpen(false)} />
+                    </DialogContent>
                 </Dialog>
             </div>
         )
@@ -151,9 +64,9 @@ export default function PaymentsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="px-1">
+            <div className="flex justify-between items-center px-1">
                 <Select value={selectedAccount || ''} onValueChange={setSelectedAccount}>
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select Account" />
                     </SelectTrigger>
                     <SelectContent>
@@ -162,6 +75,16 @@ export default function PaymentsPage() {
                         ))}
                     </SelectContent>
                 </Select>
+                 <Dialog open={isAddAccountOpen} onOpenChange={setIsAddAccountOpen}>
+                    <DialogTrigger asChild>
+                         <Button variant="ghost" size="icon">
+                            <Plus className="h-5 w-5" />
+                         </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                       <AddPaymentAccountWithOTP onAccountAdded={handleAccountAdded} onComplete={() => setIsAddAccountOpen(false)} />
+                    </DialogContent>
+                </Dialog>
             </div>
             
             {/* Wallet Summary */}
@@ -307,5 +230,3 @@ export default function PaymentsPage() {
         </div>
     );
 }
-
-    
