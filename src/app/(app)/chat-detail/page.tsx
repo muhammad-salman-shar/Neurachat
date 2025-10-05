@@ -11,6 +11,7 @@ import Image from "next/image";
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Suspense, useState, useRef, ChangeEvent, useCallback } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useToast } from "@/hooks/use-toast";
 
 
 type Message = {
@@ -26,6 +27,7 @@ type Message = {
 function ChatContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { toast } = useToast();
 
   const agentName = searchParams.get('agent') || 'AI Companion';
   const agentEmoji = searchParams.get('emoji') || '🤖';
@@ -43,49 +45,98 @@ function ChatContent() {
     setIsOnlineMode(isOnline);
   }, []);
 
+  // --- Placeholder Functions for API Integration ---
+
+  const sendMessageToServer = async (messageText: string) => {
+    // TODO: Integrate with {API_SEND_MESSAGE_ENDPOINT}
+    console.log("Attempting to send message via server:", messageText);
+    toast({
+        title: "Online Mode",
+        description: "This would send a message through the server.",
+    });
+    // Example payload for {API_SEND_MESSAGE_ENDPOINT}
+    const payload = {
+        contactId: agentName, // or a real ID
+        message: messageText,
+        timestamp: new Date().toISOString(),
+    };
+    // const response = await fetch('{API_SEND_MESSAGE_ENDPOINT}', {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer {API_GET_AUTH_TOKEN}` },
+    //     body: JSON.stringify(encryptPayload(payload)),
+    // });
+    // if (!response.ok) { onServerError(new Error('Failed to send message')); }
+  };
+
+  const sendMessageViaLocalSMS = (phone: string, message: string) => {
+    // {LOCAL_SMS_HANDLER}
+    console.log("Falling back to local SMS.");
+    window.location.href = `sms:${phone}?body=${encodeURIComponent(message)}`;
+  };
+  
+  const initiateCallOnServer = () => {
+      // TODO: Integrate with {API_CALL_INITIATE_ENDPOINT}
+      console.log("Attempting to initiate call via server.");
+      toast({
+          title: "Online Call",
+          description: "This would start a call through the server.",
+      });
+      // Example payload for {API_CALL_INITIATE_ENDPOINT}
+      const payload = {
+        contactId: agentName,
+        timestamp: new Date().toISOString(),
+      };
+      // fetch('{API_CALL_INITIATE_ENDPOINT}', {
+      //     method: 'POST',
+      //     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer {API_GET_AUTH_TOKEN}` },
+      //     body: JSON.stringify(encryptPayload(payload)),
+      // })
+  };
+
+  const initiateLocalCall = (phone: string) => {
+      // {LOCAL_CALL_HANDLER}
+      console.log("Falling back to local call.");
+      window.location.href = `tel:${phone}`;
+  };
+
+  // --- End Placeholder Functions ---
+
   const handleSendMessage = () => {
     if (inputValue.trim() === '') return;
     
-    // Check if it's a real contact (has phone and emoji is user icon)
     const isRealContact = contactPhone && contactPhone !== 'undefined' && contactPhone !== 'null';
 
     if (isRealContact && isOnlineMode) {
-        const whatsappUri = `https://wa.me/${contactPhone.replace(/\+/g, '')}?text=${encodeURIComponent(inputValue)}`;
-        window.open(whatsappUri, '_blank');
-        setInputValue('');
-        return;
-    }
-    
-    if (isRealContact && agentEmoji === '👤') {
-      const smsUri = `sms:${contactPhone}?body=${encodeURIComponent(inputValue)}`;
-      window.location.href = smsUri;
-      setInputValue('');
-      return;
-    }
-
-    if (isNewChat && messages.length === 0) {
-       try {
-            const existingChats = JSON.parse(localStorage.getItem("chats") || "[]");
-            const isAlreadyAdded = existingChats.some((chat: any) => chat.name === agentName);
-    
-            if (!isAlreadyAdded) {
-                 const newChat = {
-                    name: agentName,
-                    avatar: agentAvatar,
-                    hint: "person face",
-                    message: inputValue,
-                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    emoji: agentEmoji,
-                    unread: true,
-                    phone: contactPhone,
-                };
-                localStorage.setItem("chats", JSON.stringify([...existingChats, newChat]));
-            }
-        } catch (error) {
-            console.error("Failed to update chats in localStorage", error);
-        }
-        router.push('/chats');
-        return;
+        // --- API INTEGRATION POINT (ONLINE) ---
+        sendMessageToServer(inputValue);
+        // Add message to local UI optimistically
+    } else if (isRealContact) {
+        // --- FALLBACK (OFFLINE) ---
+        sendMessageViaLocalSMS(contactPhone, inputValue);
+    } else if (isNewChat && messages.length === 0) {
+        // This is for creating a new chat from scratch, not for an existing contact
+         try {
+              const existingChats = JSON.parse(localStorage.getItem("chats") || "[]");
+              const isAlreadyAdded = existingChats.some((chat: any) => chat.name === agentName);
+      
+              if (!isAlreadyAdded) {
+                   const newChat = {
+                      name: agentName,
+                      avatar: agentAvatar,
+                      hint: "person face",
+                      message: inputValue,
+                      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                      emoji: agentEmoji,
+                      unread: true,
+                      phone: contactPhone,
+                  };
+                  localStorage.setItem("chats", JSON.stringify([...existingChats, newChat]));
+              }
+          } catch (error) {
+              console.error("Failed to update chats in localStorage", error);
+          }
+          router.push('/chats');
+          return;
     }
 
 
@@ -106,6 +157,7 @@ function ChatContent() {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
+        // uploadMediaToServer(e.target?.result) -> then send message with media ID
         const newMessage: Message = {
           id: Date.now().toString(),
           sender: 'user',
@@ -152,16 +204,17 @@ function ChatContent() {
 
   const handleMakeCall = (callType: 'voice' | 'video' = 'voice') => {
     const isRealContact = contactPhone && contactPhone !== 'undefined' && contactPhone !== 'null';
-    if (isRealContact) {
-      if(isOnlineMode) {
-        // WhatsApp call link (voice only, video call link is not standardized)
-        const whatsappUri = `https://wa.me/${contactPhone.replace(/\+/g, '')}`;
-        window.open(whatsappUri, '_blank');
-      } else {
-        window.location.href = `tel:${contactPhone}`;
-      }
+    if (!isRealContact) {
+       alert("No phone number available for this contact.");
+       return;
+    }
+
+    if (isOnlineMode) {
+        // --- API INTEGRATION POINT (ONLINE) ---
+        initiateCallOnServer();
     } else {
-      alert("No phone number available for this contact.");
+        // --- FALLBACK (OFFLINE) ---
+        initiateLocalCall(contactPhone);
     }
   };
 
