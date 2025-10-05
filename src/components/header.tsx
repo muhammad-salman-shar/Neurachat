@@ -75,7 +75,8 @@ export default function Header() {
     isChatDetailPage ||
     pathname === "/create-group" ||
     pathname === "/reminders" ||
-    pathname === "/profile"
+    pathname === "/profile" ||
+    pathname === "/create-contact"
   );
   
   const AgentSettingsMenu = () => (
@@ -108,18 +109,6 @@ export default function Header() {
           <Bot className="mr-2 h-4 w-4" />
           <span>Agent Mode</span>
         </DropdownMenuItem>
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
-            <Palette className="mr-2 h-4 w-4" />
-            <span>Theme Color</span>
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent>
-            <DropdownMenuItem>Red</DropdownMenuItem>
-            <DropdownMenuItem>Green</DropdownMenuItem>
-            <DropdownMenuItem>Neon</DropdownMenuItem>
-            <DropdownMenuItem>Blue</DropdownMenuItem>
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <Trash2 className="mr-2 h-4 w-4" />
