@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageSquare, Phone, UserPlus, Pencil } from "lucide-react";
+import { MessageSquare, Phone, UserPlus, User } from "lucide-react";
 import type { Chat } from "@/app/(app)/chats/page";
 import { useRouter } from "next/navigation";
 
@@ -55,7 +55,7 @@ export default function ChatActionsSheet({
     router.push("/create-group");
   };
 
-  const handleEditProfile = () => {
+  const handleViewProfile = () => {
     // This would navigate to a profile editing screen
     // For now, it can navigate to the main profile page
     const profileUrl = `/profile?name=${encodeURIComponent(
@@ -84,9 +84,9 @@ export default function ChatActionsSheet({
       action: handleAddToGroup,
     },
     {
-      label: "Edit Profile",
-      icon: Pencil,
-      action: handleEditProfile,
+      label: "View Profile",
+      icon: User,
+      action: handleViewProfile,
     },
   ];
 
