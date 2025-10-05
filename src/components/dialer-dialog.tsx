@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MessageSquare, Phone, Delete, UserPlus, X } from "lucide-react";
+import { MessageSquare, Phone, UserPlus, X, Delete } from "lucide-react";
 
 type DialerDialogProps = {
   open: boolean;
@@ -21,37 +21,18 @@ type DialerDialogProps = {
   children: React.ReactNode;
 };
 
-const keypadButtons = [
-  "1", "2", "3",
-  "4", "5", "6",
-  "7", "8", "9",
-  "*", "0", "#",
-];
-
 export default function DialerDialog({ open, onOpenChange, children }: DialerDialogProps) {
   const [number, setNumber] = useState("");
   const router = useRouter();
-  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (open) {
-      // Focus the input when the dialog opens
       setTimeout(() => inputRef.current?.focus(), 100);
+    } else {
+      setNumber(""); // Reset number when dialog closes
     }
   }, [open]);
-
-  const handleKeyPress = (key: string) => {
-    setNumber((prev) => prev + key);
-  };
-
-  const handleBackspace = () => {
-    setNumber((prev) => prev.slice(0, -1));
-  };
-  
-  const handleClear = () => {
-    setNumber("");
-  }
 
   const handleCall = () => {
     if (number) {
@@ -74,45 +55,8 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
     }
   };
 
-  const handleDialogChange = (isOpen: boolean) => {
-    onOpenChange(isOpen);
-    if (!isOpen) {
-        setNumber("");
-    }
-  }
-
-  const handleZeroPressStart = () => {
-    longPressTimer.current = setTimeout(() => {
-      setNumber(prev => prev + '+');
-      longPressTimer.current = null;
-    }, 500);
-  };
-
-  const handleZeroPressEnd = () => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-      handleKeyPress('0');
-    }
-  };
-
-  const handleBackspacePressStart = () => {
-    longPressTimer.current = setTimeout(() => {
-      handleClear();
-      longPressTimer.current = null;
-    }, 700);
-  };
-
-  const handleBackspacePressEnd = () => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-      handleBackspace();
-    }
-  };
-
   return (
-    <Dialog open={open} onOpenChange={handleDialogChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px] flex flex-col p-4 top-auto bottom-0 translate-x-[-50%] translate-y-0 rounded-b-none sm:rounded-b-lg data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom">
         <DialogHeader className="text-center sr-only">
@@ -124,10 +68,11 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
             <span className="sr-only">Close</span>
           </Button>
         </DialogClose>
-        <div className="flex-grow flex flex-col justify-end">
+        <div className="flex-grow flex flex-col justify-between">
             <div className="p-4 text-center">
                 <Input
                     ref={inputRef}
+                    type="tel"
                     value={number}
                     onChange={(e) => setNumber(e.target.value)}
                     className="text-3xl font-light text-center border-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent shrink-0"
@@ -135,31 +80,7 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
                 />
             </div>
             
-            <div className="grid grid-cols-3 gap-2 px-4">
-                {keypadButtons.map((key) => {
-                  const props = key === '0' ? {
-                    onMouseDown: handleZeroPressStart,
-                    onMouseUp: handleZeroPressEnd,
-                    onTouchStart: handleZeroPressStart,
-                    onTouchEnd: handleZeroPressEnd,
-                  } : {
-                    onClick: () => handleKeyPress(key)
-                  };
-                  return (
-                    <Button
-                      key={key}
-                      variant="ghost"
-                      className="h-20 text-3xl font-light rounded-full relative"
-                      {...props}
-                    >
-                      {key}
-                      {key === '0' && <span className="absolute bottom-5 text-xs font-semibold">+</span>}
-                    </Button>
-                  );
-                })}
-            </div>
-
-             <div className="flex justify-around items-center p-4">
+            <div className="flex justify-around items-center p-4">
                 <Button variant="ghost" className="h-20 w-20 rounded-full flex-col gap-1" onClick={handleMessage} disabled={!number}>
                     <MessageSquare className="h-6 w-6" />
                     <span className="text-xs">Message</span>
@@ -172,24 +93,11 @@ export default function DialerDialog({ open, onOpenChange, children }: DialerDia
                 >
                     <Phone className="h-8 w-8" />
                 </Button>
-                <Button
-                    variant="ghost"
-                    className="h-20 w-20 rounded-full"
-                    onMouseDown={handleBackspacePressStart}
-                    onMouseUp={handleBackspacePressEnd}
-                    onTouchStart={handleBackspacePressStart}
-                    onTouchEnd={handleBackspacePressEnd}
-                    disabled={!number}
-                >
-                    <Delete className="h-8 w-8" />
+                 <Button variant="ghost" className="h-20 w-20 rounded-full flex-col gap-1" onClick={handleAddContact} disabled={!number}>
+                    <UserPlus className="h-6 w-6" />
+                    <span className="text-xs">Add Contact</span>
                 </Button>
             </div>
-             <div className="flex justify-center items-center pb-4">
-                <Button variant="link" onClick={handleAddContact} disabled={!number}>
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  Add to Contacts
-                </Button>
-             </div>
         </div>
       </DialogContent>
     </Dialog>
