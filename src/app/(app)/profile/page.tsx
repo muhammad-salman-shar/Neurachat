@@ -1,22 +1,28 @@
 
 "use client";
 
-import { Suspense } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Phone, MessageSquare, Video } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Phone, MessageSquare, Edit, Save } from 'lucide-react';
+import type { Chat } from '@/app/(app)/chats/page';
 
 function ProfileContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const name = searchParams.get('name') || 'Unknown User';
-    const avatar = searchParams.get('avatar') || 'https://placehold.co/128x128.png';
-    const phone = searchParams.get('phone') || 'No phone number';
-    const emoji = searchParams.get('emoji');
 
+    const initialName = searchParams.get('name') || 'Unknown User';
+    const avatar = searchParams.get('avatar') || 'https://placehold.co/128x128.png';
+    const initialPhone = searchParams.get('phone') || 'No phone number';
+    const emoji = searchParams.get('emoji');
+    const originalName = searchParams.get('name') || '';
+
+    const [isEditing, setIsEditing] = useState(false);
+    const [name, setName] = useState(initialName);
+    const [phone, setPhone] = useState(initialPhone);
 
     const handleMakeCall = () => {
         if (phone && phone !== 'No phone number') {
@@ -27,11 +33,33 @@ function ProfileContent() {
     };
 
     const handleSendMessage = () => {
-        if (phone && phone !== 'No phone number' && emoji !== '👤') {
-             window.location.href = `sms:${phone}`;
-        } else {
-             router.push(`/chat-detail?agent=${encodeURIComponent(name)}&avatar=${encodeURIComponent(avatar)}&phone=${encodeURIComponent(phone)}`);
+        const chatUrl = `/chat-detail?agent=${encodeURIComponent(name)}&avatar=${encodeURIComponent(avatar)}&phone=${encodeURIComponent(phone)}&emoji=${encodeURIComponent(emoji || '')}`;
+        router.push(chatUrl);
+    };
+
+    const handleEditToggle = () => {
+        setIsEditing(!isEditing);
+    };
+
+    const handleSave = () => {
+        try {
+            const chats: Chat[] = JSON.parse(localStorage.getItem('chats') || '[]');
+            const updatedChats = chats.map(chat => {
+                if (chat.name === originalName) {
+                    return { ...chat, name, phone };
+                }
+                return chat;
+            });
+            localStorage.setItem('chats', JSON.stringify(updatedChats));
+            
+            // Update URL to reflect new name for future edits, without reloading the page
+            const newUrl = `${window.location.pathname}?name=${encodeURIComponent(name)}&avatar=${encodeURIComponent(avatar)}&phone=${encodeURIComponent(phone)}&emoji=${encodeURIComponent(emoji || '')}`;
+            window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
+
+        } catch (error) {
+            console.error("Failed to save contact changes:", error);
         }
+        setIsEditing(false);
     };
 
     return (
@@ -44,8 +72,25 @@ function ProfileContent() {
             </div>
             
             <div className="text-center">
-                <h1 className="text-3xl font-bold">{name}</h1>
-                <p className="text-muted-foreground">{phone}</p>
+                {isEditing ? (
+                    <Input 
+                        className="text-3xl font-bold text-center bg-transparent border-0 border-b-2 rounded-none h-auto focus-visible:ring-0"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                    />
+                ) : (
+                    <h1 className="text-3xl font-bold">{name}</h1>
+                )}
+                {isEditing ? (
+                    <Input
+                        type="tel"
+                        className="text-center text-muted-foreground bg-transparent border-0 h-auto focus-visible:ring-0"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                    />
+                ) : (
+                    <p className="text-muted-foreground">{phone}</p>
+                )}
             </div>
 
             <div className="flex gap-4">
@@ -60,8 +105,17 @@ function ProfileContent() {
             </div>
 
             <Card className="w-full max-w-md">
-                <CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle>User Info</CardTitle>
+                    {isEditing ? (
+                        <Button variant="outline" size="icon" onClick={handleSave}>
+                            <Save className="h-5 w-5" />
+                        </Button>
+                    ) : (
+                        <Button variant="outline" size="icon" onClick={handleEditToggle}>
+                            <Edit className="h-5 w-5" />
+                        </Button>
+                    )}
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
