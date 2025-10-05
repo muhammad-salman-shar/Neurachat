@@ -4,11 +4,11 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Settings, ChevronLeft, Bot, Palette, Trash2, ShieldAlert, User, Search } from "lucide-react";
+import { Settings, ChevronLeft, Bot, Trash2, ShieldAlert, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
@@ -48,7 +48,7 @@ export default function Header() {
       return (
         <div className="text-center">
           <h1 className="text-xl font-bold">{agentName}</h1>
-          <p className="text-xs font-medium opacity-80">Active now</p>
+          <p className="text-xs font-medium opacity-80">{isOnline ? "Online" : "Active now"}</p>
         </div>
       );
     }
