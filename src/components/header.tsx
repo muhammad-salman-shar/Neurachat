@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import Link from "next/link";
@@ -99,8 +98,6 @@ export default function Header() {
             <DropdownMenuSeparator />
           </>
         )}
-        <DropdownMenuLabel>Agent Settings</DropdownMenuLabel>
-        <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href={`/profile?name=${encodeURIComponent(agentName || '')}&avatar=${encodeURIComponent(agentAvatar || '')}&phone=${encodeURIComponent(agentPhone || '')}&emoji=${encodeURIComponent(agentEmoji || '')}`}>
             <User className="mr-2 h-4 w-4" />
