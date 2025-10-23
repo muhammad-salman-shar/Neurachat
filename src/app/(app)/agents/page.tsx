@@ -10,7 +10,7 @@ const agents = [
     { name: "Teacher Agent", mood: "Strict", icon: <BrainCircuit />, avatar: "https://placehold.co/100x100.png", hint: "teacher woman", status: "Next Quiz - 'Kal revise kiya?'", active: true, emoji: "📝" },
     { name: "Boss Agent", mood: "Professional", icon: <Briefcase />, avatar: "https://placehold.co/100x100.png", hint: "business man", status: "Focus on your goals!", active: false, emoji: "💼" },
     { name: "Girlfriend Agent", mood: "Caring", icon: <Heart />, avatar: "https://placehold.co/100x100.png", hint: "happy woman", status: "How was your day?", active: true, emoji: "🥰" },
-    { name: "Religious Guide", mood: "Wise", icon: <ShieldCheck />, avatar: "https://placehold.co/100x100.png", hint: "wise person", status: "Peace be upon you.", active: false, emoji: "🙏" },
+    { name: "Religious Guide", mood: "Wise", icon: <ShieldCheck />, avatar: "https://placehold.co/100x100.png", hint: "wise person", status: "Peace be upon you.", active: false, emoji: "🙂‍↕️" },
     { name: "Gym Coach", mood: "Energetic", icon: <Dumbbell />, avatar: "https://placehold.co/100x100.png", hint: "fit person", status: "Let's get pumping!", active: true, emoji: "💪" },
     { name: "Comedian Agent", mood: "Sarcastic", icon: <Zap />, avatar: "https://placehold.co/100x100.png", hint: "laughing person", status: "Ready for a joke?", active: true, emoji: "😂" },
     { name: "Business Mentor", mood: "Serious", icon: <TrendingUp />, avatar: "https://placehold.co/100x100.png", hint: "mentor professional", status: "Let's talk strategy.", active: false, emoji: "📈" },

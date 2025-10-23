@@ -4,13 +4,14 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Settings, ChevronLeft, Bot, Trash2, ShieldAlert, User } from "lucide-react";
+import { Settings, ChevronLeft, Bot, Trash2, ShieldAlert, User, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import AssistantOverlay from "@/components/assistant-overlay";
 
 export default function Header() {
   const pathname = usePathname();
@@ -19,6 +20,7 @@ export default function Header() {
   const [animate, setAnimate] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
 
 
   const isChatDetailPage = pathname === "/chat-detail";
@@ -123,6 +125,7 @@ export default function Header() {
   );
 
   return (
+    <>
     <header className={cn(
       "flex h-16 items-center justify-between gap-4 px-4 md:px-6 sticky top-0 z-30", 
       isChatDetailPage 
@@ -148,9 +151,14 @@ export default function Header() {
         {isChatDetailPage ? (
            <AgentSettingsMenu />
         ) : (
-           <div /> // Placeholder to keep title centered
+           <Button variant="ghost" size="icon" onClick={() => setIsAssistantOpen(true)}>
+                <Mic className="h-6 w-6" />
+                <span className="sr-only">Open Assistant</span>
+            </Button>
         )}
       </div>
     </header>
+    {isAssistantOpen && <AssistantOverlay onClose={() => setIsAssistantOpen(false)} />}
+    </>
   );
 }
