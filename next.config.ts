@@ -2,13 +2,16 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   output: 'export',
-  // Yahan se serverActions hata diya hai apun ne
+  images: {
+    unoptimized: true, // Agle kisi image ke error ko pehle hi dher kar diya!
+  },
   eslint: {
-    ignoreDuringBuilds: true, // Actions fail na ho faltu warnings pe
+    ignoreDuringBuilds: true, // Linting ki wajah se build crash nahi hogi
   },
   typescript: {
-    ignoreBuildErrors: true, // Typescript ki choti galtiyo ko ignore karega
+    ignoreBuildErrors: true, // TypeScript ke chote-mote nakhre ignore
   }
 };
 
 export default nextConfig;
+
