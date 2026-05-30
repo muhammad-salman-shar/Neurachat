@@ -42,4 +42,7 @@ next-env.d.ts
 
 # firebase
 firebase-debug.log
-firestore-debug.log
+firestore-debug.logGEMINI_API_KEY=AIzaSyBH312um813MkMLJgGU7S7Gz8n6XF5HaVkgoogle-services.json
+.idx/
+.next/
+node_modules/
