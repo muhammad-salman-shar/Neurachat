@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">NeuraChat</string>
+    <string name="title_activity_main">NeuraChat</string>
+    <string name="package_name">com.neurasamu.neurachat</string>
+    <string name="custom_url_scheme">com.neurasamu.neurachat</string>
+</resources>
