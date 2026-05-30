@@ -42,7 +42,12 @@ jobs:
         fi
 
     - name: Add Android Platform
-      run: npx cap add android
+      run: rm -rf android
+
+    - name: Fresh Cap Add
+      run: |
+        rm -rf android
+        npx cap add android
 
     - name: Copy Custom AndroidManifest
       run: cp .github/manifests/AndroidManifest.xml android/app/src/main/AndroidManifest.xml
