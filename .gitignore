@@ -46,3 +46,4 @@ firestore-debug.logGEMINI_API_KEY=AIzaSyBH312um813MkMLJgGU7S7Gz8n6XF5HaVkgoogle-
 .idx/
 .next/
 node_modules/
+android/
