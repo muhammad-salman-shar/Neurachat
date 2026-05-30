@@ -1,32 +1,14 @@
-import type {NextConfig} from 'next';
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  output: 'export',
+  // Yahan se serverActions hata diya hai apun ne
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: true, // Actions fail na ho faltu warnings pe
   },
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'placehold.co',
-        port: '',
-        pathname: '/**',
-      },
-    ],
-  },
-  experimental: {
-    serverActions: {
-      bodySizeLimit: '20mb', // Increase body size limit for video data
-    },
-  },
-  // Increase server action timeout to 2 minutes for video generation
-  serverActions: {
-    bodySizeLimit: '20mb',
-  },
+  typescript: {
+    ignoreBuildErrors: true, // Typescript ki choti galtiyo ko ignore karega
+  }
 };
 
 export default nextConfig;
