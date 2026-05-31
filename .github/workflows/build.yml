@@ -52,6 +52,11 @@ jobs:
     - name: Copy Custom AndroidManifest
       run: cp .github/manifests/AndroidManifest.xml android/app/src/main/AndroidManifest.xml
 
+    - name: Copy Native Java Files
+      run: |
+        cp .github/java/SmsReceiver.java android/app/src/main/java/com/neurasamu/neurachat/
+        cp .github/java/MmsReceiver.java android/app/src/main/java/com/neurasamu/neurachat/
+        cp .github/java/CallService.java android/app/src/main/java/com/neurasamu/neurachat/
     - name: Sync Android
       run: npx cap sync android
 
